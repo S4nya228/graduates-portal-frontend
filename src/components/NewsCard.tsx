@@ -1,12 +1,7 @@
 import React from 'react'
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-} from '../../components/Card'
-import Button from '../../components/Button'
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/Avatar'
+import { Card, CardContent, CardFooter, CardHeader } from './Card'
+import Button from './Button'
+import { Avatar, AvatarFallback, AvatarImage } from './Avatar'
 import { Heart, MessageSquare, Share2 } from 'lucide-react'
 
 export interface NewsCardProps {

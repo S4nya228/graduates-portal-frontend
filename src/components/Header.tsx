@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import Button from '../Button'
+import Button from './Button'
 import { Home, User, Users, Search, Menu, X, LogIn } from 'lucide-react'
 
 const Header = () => {
