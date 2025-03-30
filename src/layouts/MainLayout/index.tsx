@@ -7,6 +7,7 @@ import Login from '../../pages/Login'
 import Register from '../../pages/Register'
 import NotFound from '../../pages/NotFound'
 import Profile from '../../pages/Profile'
+import SearchAlumni from '../../pages/Search'
 
 function MainLayout() {
 	return (
@@ -18,6 +19,7 @@ function MainLayout() {
 					<Route path="/login" element={<Login />} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/profile" element={<Profile />} />
+					<Route path="/search" element={<SearchAlumni />} />
 					<Route path="*" element={<NotFound />} />
 				</Routes>
 			</main>
