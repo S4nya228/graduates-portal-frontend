@@ -75,6 +75,10 @@
 		);
 	}
 
+	.bg-muted {
+		background-color: red;
+	}
+
 	@keyframes fade-in {
 		0% {
 			opacity: 0;
