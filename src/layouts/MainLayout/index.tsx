@@ -8,6 +8,7 @@ import Register from '../../pages/Register'
 import NotFound from '../../pages/NotFound'
 import Profile from '../../pages/Profile'
 import SearchAlumni from '../../pages/Search'
+import Publication from '../../pages/Publication'
 
 function MainLayout() {
 	return (
@@ -20,6 +21,7 @@ function MainLayout() {
 					<Route path="/register" element={<Register />} />
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/search" element={<SearchAlumni />} />
+					<Route path="/publication/:id" element={<Publication />} />
 					<Route path="*" element={<NotFound />} />
 				</Routes>
 			</main>
