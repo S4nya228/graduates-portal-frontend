@@ -1,9 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 import NewsCard from '../../components/NewsCard'
 import Button from '../../components/Button'
 import { Bell, Calendar, UserPlus, ThumbsUp, MessageSquare } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import CreatePostModal from '../../components/CreatePublicationModal'
 
-const newsFeed = [
+interface News {
+	id: string
+	author: {
+		name: string
+		avatar: string
+		role?: string
+	}
+	date: string
+	title: string
+	content: string
+	image?: string
+	likes: number
+	comments: number
+	liked?: boolean
+}
+
+const newsFeed: News[] = [
 	{
 		id: '1',
 		author: {
@@ -24,27 +42,34 @@ const newsFeed = [
 	{
 		id: '2',
 		author: {
-			name: 'Олег Петренко',
-			avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+			name: 'Анна Коваленко',
+			avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+			role: 'Адміністратор',
 		},
-		date: '1 день тому',
-		title: 'Вакансії для випускників',
+		date: '2 години тому',
+		title: 'Зустріч випускників 2018 року',
 		content:
-			'Моя компанія відкрила кілька вакансій для Junior розробників. Якщо ви нещодавно закінчили університет і шукаєте роботу в сфері веб-розробки, напишіть мені для деталей.',
-		likes: 15,
-		comments: 8,
+			'Запрошуємо всіх випускників 2018 року на щорічну зустріч, яка відбудеться 15 червня в головному корпусі університету. Буде багато цікавих розмов, спогадів та нових знайомств!',
+		image:
+			'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+		likes: 24,
+		comments: 5,
+		liked: true,
 	},
 	{
 		id: '3',
 		author: {
-			name: 'Марія Іваненко',
-			avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
+			name: 'Анна Коваленко',
+			avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+			role: 'Адміністратор',
 		},
-		date: '3 дні тому',
+		date: '2 години тому',
+		title: 'Зустріч випускників 2018 року',
 		content:
-			"Поділюся своїм досвідом роботи в Google. Хто зацікавлений у кар'єрі в цій компанії, можу порадити з чого почати підготовку.",
-		likes: 32,
-		comments: 14,
+			'Запрошуємо всіх випускників 2018 року на щорічну зустріч, яка відбудеться 15 червня в головному корпусі університету. Буде багато цікавих розмов, спогадів та нових знайомств!',
+		likes: 24,
+		comments: 5,
+		liked: true,
 	},
 ]
 
@@ -69,7 +94,21 @@ const upcomingEvents = [
 	},
 ]
 
-const Index = () => {
+const Index: React.FC = () => {
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+	const [posts, setPosts] = useState<News[]>(newsFeed)
+
+	const openModal = () => setIsModalOpen(true)
+	const closeModal = () => setIsModalOpen(false)
+
+	const createPost = (newPost: {
+		title: string
+		description: string
+		image?: string
+	}) => {
+		setPosts([newPost as News, ...posts])
+	}
+
 	return (
 		<div className="min-h-screen bg-alumni-light-gray">
 			<div className="bg-alumni-gradient text-white py-20 px-4">
@@ -82,12 +121,15 @@ const Index = () => {
 						будуйте професійну мережу
 					</p>
 					<div className="flex flex-wrap justify-center gap-4">
-						<Button
-							variant="outline"
-							className="bg-white text-alumni-purple hover:bg-white/10"
-						>
-							Приєднатися до спільноти
-						</Button>
+						<Link to="/login">
+							<Button
+								variant="outline"
+								className="bg-white text-alumni-purple hover:bg-white/10"
+							>
+								Приєднатися до спільноти
+							</Button>
+						</Link>
+
 						<Button
 							variant="outline"
 							className="bg-white text-alumni-purple border-white hover:bg-white/10"
@@ -103,7 +145,11 @@ const Index = () => {
 					<div className="lg:col-span-2">
 						<div className="flex items-center justify-between mb-6">
 							<h2 className="text-2xl font-bold">Стрічка новин</h2>
-							<Button variant="outline" className=" hover:bg-[#8B5CF6]">
+							<Button
+								onClick={openModal}
+								variant="outline"
+								className=" hover:bg-[#8B5CF6]"
+							>
 								Створити публікацію
 							</Button>
 						</div>
@@ -193,6 +239,11 @@ const Index = () => {
 					</div>
 				</div>
 			</div>
+			<CreatePostModal
+				isOpen={isModalOpen}
+				closeModal={closeModal}
+				createPost={createPost}
+			/>
 		</div>
 	)
 }
