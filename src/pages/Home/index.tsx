@@ -175,7 +175,7 @@ const Index: React.FC = () => {
 									asChild
 									className=" hover:bg-[#8B5CF6]"
 								>
-									<a href="/events">Всі події</a>
+									<Link to="/events">Всі події</Link>
 								</Button>
 							</div>
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { Card, CardContent, CardFooter, CardHeader } from './Card'
 import Button from './Button'
 import { Avatar, AvatarFallback, AvatarImage } from './Avatar'
-import { Heart, MessageSquare, Share2 } from 'lucide-react'
+import { Heart, MessageSquare } from 'lucide-react'
 
 export interface NewsCardProps {
 	id: string
@@ -83,9 +83,6 @@ const NewsCard: React.FC<NewsCardProps> = ({
 						<span>{comments}</span>
 					</Button>
 				</div>
-				<Button variant="ghost" size="sm">
-					<Share2 className="w-5 h-5" />
-				</Button>
 			</CardFooter>
 		</Card>
 	)

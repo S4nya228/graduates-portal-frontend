@@ -9,6 +9,7 @@ import NotFound from '../../pages/NotFound'
 import Profile from '../../pages/Profile'
 import SearchAlumni from '../../pages/Search'
 import Publication from '../../pages/Publication'
+import Events from '../../pages/Events'
 
 function MainLayout() {
 	return (
@@ -22,6 +23,7 @@ function MainLayout() {
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/search" element={<SearchAlumni />} />
 					<Route path="/publication/:id" element={<Publication />} />
+					<Route path="/events" element={<Events />} />
 					<Route path="*" element={<NotFound />} />
 				</Routes>
 			</main>
