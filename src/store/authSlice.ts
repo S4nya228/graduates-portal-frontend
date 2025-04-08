@@ -1,15 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { User } from '../types'
 
-interface Token {
-	accessToken: string
-	refreshToken: string
-}
-
 interface State {
-	accessToken: string | null
-	refreshToken: string | null
+	token: string | null
 	user: User | null
 	isLoading: boolean
 }
@@ -17,29 +10,22 @@ interface State {
 const authSlice = createSlice({
 	name: 'auth',
 	initialState: <State>{
-		accessToken: localStorage.getItem('accessToken'),
-		refreshToken: localStorage.getItem('refreshToken'),
+		token: localStorage.getItem('token'),
 		user: null,
 		isLoading: true,
 	},
 	reducers: {
-		setToken(state, action: PayloadAction<Token>) {
-			const payload = action.payload
-			state.accessToken = payload.accessToken
-			state.refreshToken = payload.refreshToken
-			localStorage.setItem('accessToken', payload.accessToken)
-			localStorage.setItem('refreshToken', payload.refreshToken)
+		setToken(state, action: PayloadAction<{ token: string }>) {
+			state.token = action.payload.token
+			localStorage.setItem('token', action.payload.token)
 		},
 		setUser(state, action: PayloadAction<User>) {
-			const payload = action.payload
-			state.user = payload
+			state.user = action.payload
 		},
 		logout(state) {
-			state.accessToken = null
-			state.refreshToken = null
+			state.token = null
 			state.user = null
-			localStorage.removeItem('accessToken')
-			localStorage.removeItem('refreshToken')
+			localStorage.removeItem('token')
 		},
 		setLoading(state, action: PayloadAction<boolean>) {
 			state.isLoading = action.payload

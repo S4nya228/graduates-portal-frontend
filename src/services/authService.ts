@@ -1,5 +1,4 @@
 import axiosInstance from '../api/axiosInstance'
-import { User } from '../types'
 
 interface LoginData {
 	email: string
@@ -12,9 +11,7 @@ interface RegisterData extends LoginData {
 }
 
 interface AuthResponse {
-	accessToken: string
-	refreshToken: string
-	user: User
+	token: string
 }
 
 interface Service {
