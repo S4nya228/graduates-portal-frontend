@@ -4,42 +4,69 @@ import Button from './Button'
 import { Textarea } from './Textarea'
 import Input from './Input'
 import { X } from 'lucide-react'
+import axiosInstance from '../api/axiosInstance'
 
 interface CreatePostModalProps {
 	isOpen: boolean
 	closeModal: () => void
-	createPost: (newPost: {
-		title: string
-		description: string
-		image?: string
-	}) => void
+	fetchPosts: () => void
+}
+
+interface NewPost {
+	title: string
+	description: string
+	image?: File | null
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({
 	isOpen,
 	closeModal,
-	createPost,
+	fetchPosts,
 }) => {
 	const [title, setTitle] = useState<string>('')
 	const [description, setDescription] = useState<string>('')
-	const [image, setImage] = useState<string | null>(null)
+	const [image, setImage] = useState<File | null>(null)
 
 	const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0]
 		if (file) {
-			setImage(URL.createObjectURL(file))
+			setImage(file)
 		}
 	}
 
 	const handleRemoveImage = () => {
-		setImage(null) // Видаляємо зображення
+		setImage(null)
+	}
+	const resetForm = () => {
+		setTitle('')
+		setDescription('')
+		setImage(null)
 	}
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (title && description) {
-			const newPost = { title, description, image }
-			createPost(newPost)
-			closeModal()
+			const newPost: NewPost = { title, description, image }
+
+			try {
+				const formData = new FormData()
+				formData.append('title', newPost.title)
+				formData.append('content', newPost.description)
+				if (newPost.image) {
+					formData.append('file', newPost.image)
+				}
+
+				const response = await axiosInstance.post('/post', formData, {
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				})
+
+				closeModal()
+				resetForm()
+				fetchPosts()
+			} catch (error) {
+				console.error('Не вдалося створити пост', error)
+			}
 		}
 	}
 
@@ -64,6 +91,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 							onChange={(e) => setTitle(e.target.value)}
 						/>
 					</div>
+
 					<div className="flex flex-col gap-4">
 						<label
 							htmlFor="description"
@@ -78,6 +106,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 							onChange={(e) => setDescription(e.target.value)}
 						/>
 					</div>
+
 					<div>
 						<label htmlFor="image" className="block text-xl font-semibold">
 							Зображення (необов'язково)
@@ -86,7 +115,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 							{image && (
 								<div className="mt-4 relative">
 									<img
-										src={image}
+										src={URL.createObjectURL(image)}
 										alt="Preview"
 										className="w-full h-auto rounded-md"
 									/>
@@ -117,6 +146,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 						</div>
 					</div>
 				</div>
+
 				<div className="mt-6 flex justify-end gap-4">
 					<Button variant="outline" onClick={closeModal}>
 						Закрити

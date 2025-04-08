@@ -40,7 +40,6 @@ const Index: React.FC = () => {
 		try {
 			const response = await axiosInstance.get('/post')
 			setPosts(response.data)
-			console.log(response)
 		} catch (error) {
 			setError('Не вдалося отримати пости')
 		} finally {

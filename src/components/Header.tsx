@@ -27,17 +27,13 @@ const Header = () => {
 	const dispatch = useDispatch()
 
 	const fetchUserData = async () => {
-		console.log('Токен перед запитом:', token)
-
 		if (!token) {
-			console.log('Токен відсутній')
 			setIsLoggedIn(false)
 			return
 		}
 
 		try {
 			const userData = await authService.current()
-			console.log('Отримані дані користувача:', userData)
 
 			if (userData) {
 				setUser(userData)
