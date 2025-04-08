@@ -122,7 +122,6 @@ const Events = () => {
 					</p>
 				</div>
 			</div>
-
 			<div className="container mx-auto px-4 py-8">
 				<div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
 					<div className="bg-white p-3 rounded-md shadow-sm flex items-center gap-2">
@@ -140,12 +139,7 @@ const Events = () => {
 							</SelectContent>
 						</Select>
 					</div>
-
-					<Button className="bg-alumni-purple hover:bg-[#8B5CF6]/90">
-						Запропонувати подію
-					</Button>
 				</div>
-
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{filteredEvents.map((event) => (
 						<Card key={event.id} className="hover:shadow-md transition-shadow">
@@ -191,7 +185,6 @@ const Events = () => {
 						</Card>
 					))}
 				</div>
-
 				<Pagination className="mt-8">
 					<PaginationContent>
 						<PaginationItem>
