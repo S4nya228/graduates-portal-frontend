@@ -1,77 +1,10 @@
-import React, { useState } from 'react'
-import NewsCard from '../../components/NewsCard'
+import React, { useState, useEffect } from 'react'
 import Button from '../../components/Button'
-import { Bell, Calendar, UserPlus, ThumbsUp, MessageSquare } from 'lucide-react'
+import { Bell, Calendar, ThumbsUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CreatePostModal from '../../components/CreatePublicationModal'
-
-interface News {
-	id: string
-	author: {
-		name: string
-		avatar: string
-		role?: string
-	}
-	date: string
-	title: string
-	content: string
-	image?: string
-	likes: number
-	comments: number
-	liked?: boolean
-}
-
-const newsFeed: News[] = [
-	{
-		id: '1',
-		author: {
-			name: 'Анна Коваленко',
-			avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-			role: 'Адміністратор',
-		},
-		date: '2 години тому',
-		title: 'Зустріч випускників 2018 року',
-		content:
-			'Запрошуємо всіх випускників 2018 року на щорічну зустріч, яка відбудеться 15 червня в головному корпусі університету. Буде багато цікавих розмов, спогадів та нових знайомств!',
-		image:
-			'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-		likes: 24,
-		comments: 5,
-		liked: true,
-	},
-	{
-		id: '2',
-		author: {
-			name: 'Анна Коваленко',
-			avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-			role: 'Адміністратор',
-		},
-		date: '2 години тому',
-		title: 'Зустріч випускників 2018 року',
-		content:
-			'Запрошуємо всіх випускників 2018 року на щорічну зустріч, яка відбудеться 15 червня в головному корпусі університету. Буде багато цікавих розмов, спогадів та нових знайомств!',
-		image:
-			'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-		likes: 24,
-		comments: 5,
-		liked: true,
-	},
-	{
-		id: '3',
-		author: {
-			name: 'Анна Коваленко',
-			avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-			role: 'Адміністратор',
-		},
-		date: '2 години тому',
-		title: 'Зустріч випускників 2018 року',
-		content:
-			'Запрошуємо всіх випускників 2018 року на щорічну зустріч, яка відбудеться 15 червня в головному корпусі університету. Буде багато цікавих розмов, спогадів та нових знайомств!',
-		likes: 24,
-		comments: 5,
-		liked: true,
-	},
-]
+import axiosInstance from '../../api/axiosInstance'
+import NewsCard from '../../components/NewsCard'
 
 const upcomingEvents = [
 	{
@@ -96,17 +29,35 @@ const upcomingEvents = [
 
 const Index: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-	const [posts, setPosts] = useState<News[]>(newsFeed)
+	const [posts, setPosts] = useState<any[]>([])
+	const [loading, setLoading] = useState<boolean>(true)
+	const [error, setError] = useState<string | null>(null)
 
 	const openModal = () => setIsModalOpen(true)
 	const closeModal = () => setIsModalOpen(false)
 
-	const createPost = (newPost: {
-		title: string
-		description: string
-		image?: string
-	}) => {
-		setPosts([newPost as News, ...posts])
+	const fetchPosts = async () => {
+		try {
+			const response = await axiosInstance.get('/post')
+			setPosts(response.data)
+			console.log(response)
+		} catch (error) {
+			setError('Не вдалося отримати пости')
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	useEffect(() => {
+		fetchPosts()
+	}, [])
+
+	if (loading) {
+		return <div>Завантаження...</div>
+	}
+
+	if (error) {
+		return <div>{error}</div>
 	}
 
 	return (
@@ -154,8 +105,8 @@ const Index: React.FC = () => {
 							</Button>
 						</div>
 
-						{newsFeed.map((news) => (
-							<NewsCard key={news.id} {...news} />
+						{posts.map((post) => (
+							<NewsCard key={post.id} post={post} />
 						))}
 
 						<div className="text-center mt-8">
@@ -210,13 +161,6 @@ const Index: React.FC = () => {
 									variant="outline"
 									className="justify-start hover:bg-[#8B5CF6]"
 								>
-									<UserPlus className="mr-2 h-4 w-4" />
-									Запросити
-								</Button>
-								<Button
-									variant="outline"
-									className="justify-start hover:bg-[#8B5CF6]"
-								>
 									<Bell className="mr-2 h-4 w-4" />
 									Сповіщення
 								</Button>
@@ -227,13 +171,6 @@ const Index: React.FC = () => {
 									<ThumbsUp className="mr-2 h-4 w-4" />
 									Підтримка
 								</Button>
-								<Button
-									variant="outline"
-									className="justify-start hover:bg-[#8B5CF6]"
-								>
-									<MessageSquare className="mr-2 h-4 w-4" />
-									Чат
-								</Button>
 							</div>
 						</div>
 					</div>
@@ -242,7 +179,7 @@ const Index: React.FC = () => {
 			<CreatePostModal
 				isOpen={isModalOpen}
 				closeModal={closeModal}
-				createPost={createPost}
+				fetchPosts={fetchPosts}
 			/>
 		</div>
 	)

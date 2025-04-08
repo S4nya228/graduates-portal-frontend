@@ -1,12 +1,65 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Button from './Button'
-import { Home, User, Users, Search, Menu, X, LogIn } from 'lucide-react'
+import {
+	Home,
+	User,
+	Users,
+	Search,
+	Menu,
+	X,
+	LogIn,
+	Calendar,
+} from 'lucide-react'
+import authService from '../services/userService'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState } from '../store'
+import { authActions } from '../store/authSlice'
+import { User as UserType } from '../types'
 
 const Header = () => {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+	const [user, setUser] = useState<UserType | null>(null)
+	const [isLoggedIn, setIsLoggedIn] = useState(false)
 	const location = useLocation()
-	const isLoggedIn = false
+
+	const token = useSelector((state: RootState) => state.auth.token)
+	const dispatch = useDispatch()
+
+	const fetchUserData = async () => {
+		console.log('Токен перед запитом:', token)
+
+		if (!token) {
+			console.log('Токен відсутній')
+			setIsLoggedIn(false)
+			return
+		}
+
+		try {
+			const userData = await authService.current()
+			console.log('Отримані дані користувача:', userData)
+
+			if (userData) {
+				setUser(userData)
+				setIsLoggedIn(true)
+			} else {
+				setIsLoggedIn(false)
+			}
+		} catch (error) {
+			console.log('Помилка при отриманні даних користувача:', error)
+			setIsLoggedIn(false)
+		}
+	}
+
+	const handleLogout = () => {
+		dispatch(authActions.logout())
+		setUser(null)
+		setIsLoggedIn(false)
+	}
+
+	useEffect(() => {
+		fetchUserData()
+	}, [token])
 
 	const toggleMenu = () => {
 		setMobileMenuOpen(!mobileMenuOpen)
@@ -25,6 +78,11 @@ const Header = () => {
 			path: '/search',
 			icon: <Search className="w-5 h-5 mr-2" />,
 			requiresAuth: true,
+		},
+		{
+			name: 'Події',
+			path: '/events',
+			icon: <Calendar className="w-5 h-5 mr-2" />,
 		},
 	]
 
@@ -62,9 +120,18 @@ const Header = () => {
 					))}
 
 					{isLoggedIn ? (
-						<Button variant="outline" className="ml-2 cursor-pointer">
-							Вийти
-						</Button>
+						<>
+							<div className="flex items-center">
+								<span className="mr-2">Привіт, {user?.name}</span>
+								<Button
+									variant="outline"
+									className="ml-2 cursor-pointer"
+									onClick={handleLogout}
+								>
+									Вийти
+								</Button>
+							</div>
+						</>
 					) : (
 						<Link to="/login">
 							<Button className="bg-[#8B5CF6] hover:bg-[#8B5CF6]/90 text-white flex items-center cursor-pointer">
@@ -108,7 +175,11 @@ const Header = () => {
 						))}
 
 						{isLoggedIn ? (
-							<Button variant="outline" className="w-full mt-2">
+							<Button
+								variant="outline"
+								className="w-full mt-2"
+								onClick={handleLogout}
+							>
 								Вийти
 							</Button>
 						) : (

@@ -10,11 +10,13 @@ import Profile from '../../pages/Profile'
 import SearchAlumni from '../../pages/Search'
 import Publication from '../../pages/Publication'
 import Events from '../../pages/Events'
+import ScrollToTop from '../../components/ScrollToTop'
 
 function MainLayout() {
 	return (
 		<>
 			<Header />
+			<ScrollToTop />
 			<main>
 				<Routes>
 					<Route index element={<Home />} />
