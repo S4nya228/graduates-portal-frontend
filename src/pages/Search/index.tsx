@@ -12,7 +12,7 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from '../../components/Pagination'
-import Button from '../../components/Button'
+import Button from '../../components/ui/Button'
 
 const mockAlumniData = [
 	{

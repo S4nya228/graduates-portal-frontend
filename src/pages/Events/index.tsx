@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Calendar, MapPin, Users, Clock, Filter } from 'lucide-react'
-import Button from '../../components/Button'
+import Button from '../../components/ui/Button'
 import {
 	Pagination,
 	PaginationContent,
@@ -23,7 +23,7 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '../../components/Select'
+} from '../../components/ui/Select'
 
 const eventsData = [
 	{
@@ -172,9 +172,6 @@ const Events = () => {
 								</div>
 							</CardContent>
 							<CardFooter className="flex justify-between">
-								<Button variant="outline" size="sm">
-									Деталі
-								</Button>
 								<Button
 									size="sm"
 									className="bg-alumni-purple hover:bg-[#8B5CF6]/90"

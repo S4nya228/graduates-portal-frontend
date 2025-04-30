@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from './Avatar'
-import Button from './Button'
-import { Textarea } from './Textarea'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/Avatar'
+import Button from './ui/Button'
+import { Textarea } from './ui/Textarea'
 import { Card } from './Card'
 import { Heart, Reply } from 'lucide-react'
 

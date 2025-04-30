@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import Button from '../../components/Button'
-import Input from '../../components/Input'
-import Label from '../../components/Label'
-import Checkbox from '../../components/Checkbox'
+import Button from '../../components/ui/Button'
+import Input from '../../components/ui/Input'
+import Label from '../../components/ui/Label'
+import Checkbox from '../../components/ui/Checkbox'
 import {
 	Card,
 	CardContent,

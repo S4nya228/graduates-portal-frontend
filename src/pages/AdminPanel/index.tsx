@@ -1,5 +1,10 @@
 import React, { useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/Tabs'
+import {
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from '../../components/ui/Tabs'
 import {
 	Card,
 	CardContent,
@@ -8,9 +13,9 @@ import {
 	CardHeader,
 	CardTitle,
 } from '../../components/Card'
-import Button from '../../components/Button'
-import Input from '../../components/Input'
-import Badge from '../../components/Badge'
+import Button from '../../components/ui/Button'
+import Input from '../../components/ui/Input'
+import Badge from '../../components/ui/Badge'
 import {
 	Users,
 	FileText,
@@ -30,7 +35,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '../../components/Table'
+} from '../../components/ui/Table'
 
 const AdminPanel = () => {
 	const [searchQuery, setSearchQuery] = useState('')

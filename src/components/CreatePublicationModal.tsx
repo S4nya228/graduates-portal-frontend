@@ -1,8 +1,8 @@
 import React, { useState, ChangeEvent } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import Button from './Button'
-import { Textarea } from './Textarea'
-import Input from './Input'
+import Button from './ui/Button'
+import { Textarea } from './ui/Textarea'
+import Input from './ui/Input'
 import { X } from 'lucide-react'
 import axiosInstance from '../api/axiosInstance'
 

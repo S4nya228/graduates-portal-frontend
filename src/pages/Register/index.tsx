@@ -3,16 +3,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { authActions } from '../../store/authSlice'
 import authService from '../../services/authService'
-import Button from '../../components/Button'
-import Input from '../../components/Input'
-import Label from '../../components/Label'
+import Button from '../../components/ui/Button'
+import Input from '../../components/ui/Input'
+import Label from '../../components/ui/Label'
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '../../components/Select'
+} from '../../components/ui/Select'
 import {
 	Card,
 	CardContent,

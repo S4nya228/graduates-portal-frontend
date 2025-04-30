@@ -1,44 +1,72 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/Avatar'
-import Button from '../../components/Button'
-import Badge from '../../components/Badge'
-import { Card, CardContent, CardFooter } from '../../components/Card'
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar'
+import Button from '../../components/ui/Button'
+import Badge from '../../components/ui/Badge'
+import {
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+} from '../../components/Card'
 import { ChevronLeft, Heart, MessageSquare, Calendar, User } from 'lucide-react'
 import PublicationComments from '../../components/PublicationComments'
+import postService from '../../services/postService'
 
 const Publication = () => {
 	const { id } = useParams()
+	const [publication, setPublication] = useState<any>(null)
+	const [liked, setLiked] = useState<boolean>(false)
+	const [likeCount, setLikeCount] = useState<number>(0)
+	const [loading, setLoading] = useState<boolean>(false)
+	const [error, setError] = useState<string | null>(null)
 
-	const publication = {
-		id: '1',
-		title: 'Зустріч випускників 2018 року',
-		author: {
-			name: 'Анна Коваленко',
-			avatar: '',
-		},
-		date: '02.07.2023',
-		content: `
-      Запрошуємо всіх випускників 2018 року на щорічну зустріч, яка відбудеться 15 серпня 2023 року у головному корпусі університету.
-      
-      Програма зустрічі:
-      • 14:00 - 15:00: Реєстрація та вітальна кава
-      • 15:00 - 16:30: Офіційна частина, виступи викладачів
-      • 16:30 - 19:00: Неформальне спілкування, фуршет
-      
-      Для участі необхідно зареєструватися за посиланням до 10 серпня.
-      
-      Чекаємо на зустріч з вами!
-    `,
-		image:
-			'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-		category: 'Зустрічі',
-		likes: 24,
-		comments: 5,
-		views: 127,
-		liked: false,
-		bookmarked: false,
+	useEffect(() => {
+		const fetchPost = async () => {
+			try {
+				const response = await postService.getById(id!)
+				const post = response[0]
+				setPublication(post)
+				setLikeCount(post.like_count)
+				setLiked(post.has_reaction && post.reaction_type === 'LIKE')
+			} catch (err) {
+				setError('Не вдалося завантажити публікацію.')
+			} finally {
+				setLoading(false)
+			}
+		}
+
+		fetchPost()
+	}, [id])
+
+	const handleToggleLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault()
+
+		if (loading) return
+
+		try {
+			await postService.like(publication.id)
+
+			setLiked((prev) => !prev)
+			setLikeCount((prev) => (liked ? prev - 1 : prev + 1))
+		} catch (error) {
+			console.error('Помилка лайкування поста', error)
+		} finally {
+			setLoading(false)
+		}
 	}
+
+	if (loading) return <div className="p-4 text-center">Завантаження...</div>
+	if (error) return <div className="p-4 text-center text-red-500">{error}</div>
+	if (!publication) return null
+
+	const formattedDate = publication?.created_at
+		? new Intl.DateTimeFormat('uk-UA', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+		  }).format(new Date(publication.created_at.replace('.000000Z', 'Z')))
+		: ''
 
 	return (
 		<div className="min-h-screen bg-alumni-light-gray">
@@ -65,76 +93,51 @@ const Publication = () => {
 									/>
 								</div>
 							)}
-
-							<CardContent className="pt-6 px-6">
-								<div className="flex items-center justify-between mb-4">
-									<div className="flex items-center space-x-3">
-										<Avatar>
+							<CardHeader className="pb-3">
+								<div className="flex items-center space-x-3">
+									<Avatar>
+										{publication.user_avatar && (
 											<AvatarImage
-												src={publication.author.avatar}
-												alt={publication.author.name}
+												src={publication.user_avatar}
+												alt={publication.user_name}
 											/>
-											<AvatarFallback>
-												{publication.author.name[0]}
-											</AvatarFallback>
-										</Avatar>
-										<div>
-											<div className="font-medium">
-												{publication.author.name}
-											</div>
-											<div className="text-sm text-muted-foreground flex items-center">
-												<span>{publication.date}</span>
-											</div>
+										)}
+										<AvatarFallback>{publication.user_name[0]}</AvatarFallback>
+									</Avatar>
+
+									<div>
+										<div className="font-medium">{publication.user_name}</div>
+										<div className="text-sm text-[hsl(215.4,16.3%,46.9%)] flex items-center">
+											<span>{formattedDate}</span>
 										</div>
 									</div>
-
-									<Badge
-										variant="outline"
-										className="bg-alumni-light-purple/10 text-alumni-purple border-alumni-light-purple"
-									>
-										{publication.category}
-									</Badge>
 								</div>
+							</CardHeader>
 
+							<CardContent className="pt-6 px-6">
 								<h1 className="text-2xl md:text-3xl font-bold mb-2">
 									{publication.title}
 								</h1>
-
-								<div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-6">
-									<div className="flex items-center">
-										<Calendar className="h-4 w-4 mr-1" />
-										<span>{publication.date}</span>
-									</div>
-									<div className="flex items-center">
-										<User className="h-4 w-4 mr-1" />
-										<span>{publication.author.name}</span>
-									</div>
-								</div>
-
-								<div className="prose max-w-none mb-6">
-									{publication.content.split('\n').map((paragraph, index) => (
-										<p key={index} className="mb-4">
-											{paragraph}
-										</p>
-									))}
+								<div className="prose max-w-none mb-6 whitespace-pre-line">
+									{publication.content}
 								</div>
 							</CardContent>
 
-							<CardFooter className=" pb-4 px-6 flex justify-between">
-								<div className="flex items-center space-x-4">
+							<CardFooter className="pb-4 px-6 flex justify-between">
+								<div className="flex items-center space-x-6">
 									<Button
 										variant="ghost"
 										size="sm"
-										className={`flex items-center gap-1 ${
-											publication.liked ? 'text-red-500' : ''
-										}`}
+										className="flex items-center gap-1"
+										onClick={handleToggleLike}
+										disabled={loading}
 									>
 										<Heart
-											className={`w-5 h-5 ${
-												publication.liked ? 'fill-current' : ''
+											className={`w-5 h-5 transition-colors ${
+												liked ? 'text-red-500 fill-red-500' : ''
 											}`}
 										/>
-										<span>{publication.likes}</span>
+										<span>{likeCount}</span>
 									</Button>
 									<Button
 										variant="ghost"
@@ -142,7 +145,7 @@ const Publication = () => {
 										className="flex items-center gap-1"
 									>
 										<MessageSquare className="w-5 h-5" />
-										<span>{publication.comments}</span>
+										<span>{publication.comment_count}</span>
 									</Button>
 								</div>
 							</CardFooter>
@@ -150,7 +153,7 @@ const Publication = () => {
 
 						<div className="mt-8">
 							<h2 className="text-xl font-bold mb-4">
-								Коментарі ({publication.comments})
+								Коментарі ({publication.comment_count})
 							</h2>
 							<PublicationComments publicationId={publication.id} />
 						</div>
@@ -161,24 +164,24 @@ const Publication = () => {
 							<div className="bg-white rounded-lg shadow p-6 mb-6">
 								<h2 className="text-xl font-bold mb-4">Про автора</h2>
 								<div className="flex items-center space-x-4 mb-4">
-									<Avatar className="h-16 w-16">
-										<AvatarImage
-											src={publication.author.avatar}
-											alt={publication.author.name}
-										/>
-										<AvatarFallback className="text-xl">
-											{publication.author.name[0]}
-										</AvatarFallback>
+									<Avatar>
+										{publication.user_avatar && (
+											<AvatarImage
+												src={publication.user_avatar}
+												alt={publication.user_name}
+											/>
+										)}
+										<AvatarFallback>{publication.user_name[0]}</AvatarFallback>
 									</Avatar>
+
 									<div>
 										<div className="font-bold text-lg">
-											{publication.author.name}
+											{publication.user_name}
 										</div>
 									</div>
 								</div>
 								<p className="text-muted-foreground">
-									Організатор заходів алумні-спільноти університету. Випускниця
-									2015 року, спеціальність "Маркетинг".
+									Інформація про автора публікації.
 								</p>
 								<div className="mt-4">
 									<Button variant="outline" className="w-full">
