@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import Button from './Button'
+import Button from './ui/Button'
 import {
 	Home,
 	User,
@@ -118,7 +118,7 @@ const Header = () => {
 					{isLoggedIn ? (
 						<>
 							<div className="flex items-center">
-								<span className="mr-2">Привіт, {user?.name}</span>
+								<span className="mr-2">{user?.name}</span>
 								<Button
 									variant="outline"
 									className="ml-2 cursor-pointer"

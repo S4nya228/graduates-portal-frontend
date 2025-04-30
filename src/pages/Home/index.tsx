@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import Button from '../../components/Button'
+import Button from '../../components/ui/Button'
 import { Bell, Calendar, ThumbsUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CreatePostModal from '../../components/CreatePublicationModal'
@@ -52,11 +52,22 @@ const Index: React.FC = () => {
 	}, [])
 
 	if (loading) {
-		return <div>Завантаження...</div>
+		return (
+			<div className="flex items-center justify-center h-64">
+				<div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+			</div>
+		)
 	}
 
 	if (error) {
 		return <div>{error}</div>
+	}
+
+	const handleScrollToFooter = () => {
+		const footerElement = document.getElementById('footer')
+		if (footerElement) {
+			footerElement.scrollIntoView({ behavior: 'smooth' })
+		}
 	}
 
 	return (
@@ -81,6 +92,7 @@ const Index: React.FC = () => {
 						</Link>
 
 						<Button
+							onClick={handleScrollToFooter}
 							variant="outline"
 							className="bg-white text-alumni-purple border-white hover:bg-white/10"
 						>
@@ -105,7 +117,9 @@ const Index: React.FC = () => {
 						</div>
 
 						{posts.map((post) => (
-							<NewsCard key={post.id} post={post} />
+							<Link to={`/publication/${post.id}`} key={post.id}>
+								<NewsCard post={post} />
+							</Link>
 						))}
 
 						<div className="text-center mt-8">
@@ -116,7 +130,7 @@ const Index: React.FC = () => {
 					</div>
 
 					<div>
-						<div className="bg-white rounded-lg shadow-md p-6 mb-6">
+						<div className="sticky top-20 bg-white rounded-lg shadow-md p-6 mb-6">
 							<div className="flex items-center justify-between mb-4">
 								<h3 className="text-lg font-semibold">Майбутні події</h3>
 								<Button
@@ -152,7 +166,7 @@ const Index: React.FC = () => {
 							</div>
 						</div>
 
-						<div className="bg-white rounded-lg shadow-md p-6">
+						<div className="sticky top-115 bg-white rounded-lg shadow-md p-6">
 							<h3 className="text-lg font-semibold mb-4">Швидкі дії</h3>
 
 							<div className="grid grid-cols-2 gap-3">

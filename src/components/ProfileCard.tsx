@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, CardContent, CardFooter, CardHeader } from '../components/Card'
-import Button from '../components/Button'
-import { Avatar, AvatarFallback, AvatarImage } from '../components/Avatar'
+import Button from './ui/Button'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/Avatar'
 import {
 	Briefcase,
 	GraduationCap,
@@ -9,7 +9,7 @@ import {
 	MapPin,
 	ExternalLink,
 } from 'lucide-react'
-import Badge from '../components/Badge'
+import Badge from './ui/Badge'
 
 export interface ProfileCardProps {
 	id: string

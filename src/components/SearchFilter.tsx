@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
-import Input from '../components/Input'
-import Button from '../components/Button'
-import Label from '../components/Label'
+import Input from './ui/Input'
+import Button from './ui/Button'
+import Label from './ui/Label'
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from './/Select'
-import Slider from './/Slider'
+} from './ui/Select'
+import Slider from './ui/Slider'
 import { Search, Filter, X } from 'lucide-react'
 
 export interface SearchFiltersProps {
