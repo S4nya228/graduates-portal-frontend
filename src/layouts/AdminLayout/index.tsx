@@ -6,11 +6,13 @@ import ScrollToTop from '../../components/ScrollToTop'
 
 function AdminLayout() {
 	return (
-		<Routes>
+		<>
 			<ScrollToTop />
-			<Route path="/1" element={<AdminPanel />} />
-			<Route path="*" element={<NotFound />} />
-		</Routes>
+			<Routes>
+				<Route path="/1" element={<AdminPanel />} />
+				<Route path="*" element={<NotFound />} />
+			</Routes>
+		</>
 	)
 }
 
