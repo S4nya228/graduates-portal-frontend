@@ -11,6 +11,7 @@ import SearchAlumni from '../../pages/Search'
 import Publication from '../../pages/Publication'
 import Events from '../../pages/Events'
 import ScrollToTop from '../../components/ScrollToTop'
+import Notifications from '../../pages/Notification'
 
 function MainLayout() {
 	return (
@@ -26,6 +27,7 @@ function MainLayout() {
 					<Route path="/search" element={<SearchAlumni />} />
 					<Route path="/publication/:id" element={<Publication />} />
 					<Route path="/events" element={<Events />} />
+					<Route path="/notification" element={<Notifications />} />
 					<Route path="*" element={<NotFound />} />
 				</Routes>
 			</main>
