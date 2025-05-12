@@ -5,32 +5,16 @@ import { Link } from 'react-router-dom'
 import CreatePostModal from '../../components/CreatePublicationModal'
 import axiosInstance from '../../api/axiosInstance'
 import NewsCard from '../../components/NewsCard'
-
-const upcomingEvents = [
-	{
-		id: '1',
-		title: 'День відкритих дверей',
-		date: '10 червня 2023',
-		location: 'Головний корпус',
-	},
-	{
-		id: '2',
-		title: 'ІТ-конференція випускників',
-		date: '25 червня 2023',
-		location: 'Конференц-зал B',
-	},
-	{
-		id: '3',
-		title: 'Тренінг з CV',
-		date: '5 липня 2023',
-		location: 'Онлайн',
-	},
-]
+import eventService, { Event } from '../../services/eventService'
+import SupportModal from '../../components/SupportModal'
+import postService from '../../services/postService'
 
 const Index: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 	const [posts, setPosts] = useState<any[]>([])
+	const [events, setEvents] = useState<Event[]>([])
 	const [loading, setLoading] = useState<boolean>(true)
+	const [eventsLoading, setEventsLoading] = useState<boolean>(true)
 	const [error, setError] = useState<string | null>(null)
 
 	const openModal = () => setIsModalOpen(true)
@@ -38,8 +22,8 @@ const Index: React.FC = () => {
 
 	const fetchPosts = async () => {
 		try {
-			const response = await axiosInstance.get('/post')
-			setPosts(response.data)
+			const data = await postService.getAll()
+			setPosts(data)
 		} catch (error) {
 			setError('Не вдалося отримати пости')
 		} finally {
@@ -47,8 +31,26 @@ const Index: React.FC = () => {
 		}
 	}
 
+	const fetchEvents = async () => {
+		try {
+			const data = await eventService.getAll()
+			const latestEvents = [...data]
+				.sort(
+					(a, b) =>
+						new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+				)
+				.slice(0, 3)
+			setEvents(latestEvents)
+		} catch (e) {
+			console.error('Не вдалося отримати події')
+		} finally {
+			setEventsLoading(false)
+		}
+	}
+
 	useEffect(() => {
 		fetchPosts()
+		fetchEvents()
 	}, [])
 
 	if (loading) {
@@ -110,7 +112,7 @@ const Index: React.FC = () => {
 							<Button
 								onClick={openModal}
 								variant="outline"
-								className=" hover:bg-[#8B5CF6]"
+								className="hover:bg-[#8B5CF6]"
 							>
 								Створити публікацію
 							</Button>
@@ -123,12 +125,11 @@ const Index: React.FC = () => {
 						))}
 
 						<div className="text-center mt-8">
-							<Button variant="outline" className=" hover:bg-[#8B5CF6]">
+							<Button variant="outline" className="hover:bg-[#8B5CF6]">
 								Завантажити більше
 							</Button>
 						</div>
 					</div>
-
 					<div>
 						<div className="sticky top-20 bg-white rounded-lg shadow-md p-6 mb-6">
 							<div className="flex items-center justify-between mb-4">
@@ -137,32 +138,40 @@ const Index: React.FC = () => {
 									variant="ghost"
 									size="sm"
 									asChild
-									className=" hover:bg-[#8B5CF6]"
+									className="hover:bg-[#8B5CF6]"
 								>
 									<Link to="/events">Всі події</Link>
 								</Button>
 							</div>
 
 							<div className="space-y-4">
-								{upcomingEvents.map((event) => (
-									<div
-										key={event.id}
-										className="border-b border-gray-100 last:border-0 pb-3 last:pb-0"
-									>
-										<div className="flex items-start">
-											<div className="bg-alumni-light-gray rounded p-2 mr-3">
-												<Calendar className="h-5 w-5 text-alumni-blue" />
-											</div>
-											<div>
-												<h4 className="font-medium">{event.title}</h4>
-												<p className="text-sm text-gray-500">{event.date}</p>
-												<p className="text-sm text-gray-500">
-													{event.location}
-												</p>
+								{eventsLoading ? (
+									<p className="text-sm text-gray-500">Завантаження подій...</p>
+								) : events.length === 0 ? (
+									<p className="text-sm text-gray-500">Немає подій</p>
+								) : (
+									events.map((event) => (
+										<div
+											key={event.id}
+											className="border-b border-gray-100 last:border-0 pb-3 last:pb-0"
+										>
+											<div className="flex items-start">
+												<div className="bg-alumni-light-gray rounded p-2 mr-3">
+													<Calendar className="h-5 w-5 text-alumni-blue" />
+												</div>
+												<div>
+													<h4 className="font-medium">{event.title}</h4>
+													<p className="text-sm text-gray-500">
+														{event.start_event_date}
+													</p>
+													<p className="text-sm text-gray-500">
+														{event.location}
+													</p>
+												</div>
 											</div>
 										</div>
-									</div>
-								))}
+									))
+								)}
 							</div>
 						</div>
 
@@ -170,25 +179,22 @@ const Index: React.FC = () => {
 							<h3 className="text-lg font-semibold mb-4">Швидкі дії</h3>
 
 							<div className="grid grid-cols-2 gap-3">
-								<Button
-									variant="outline"
-									className="justify-start hover:bg-[#8B5CF6]"
-								>
-									<Bell className="mr-2 h-4 w-4" />
-									Сповіщення
-								</Button>
-								<Button
-									variant="outline"
-									className="justify-start hover:bg-[#8B5CF6]"
-								>
-									<ThumbsUp className="mr-2 h-4 w-4" />
-									Підтримка
-								</Button>
+								<Link to="/notification" className="w-full">
+									<Button
+										variant="outline"
+										className="w-full justify-start hover:bg-[#8B5CF6]"
+									>
+										<Bell className="mr-2 h-4 w-4" />
+										Сповіщення
+									</Button>
+								</Link>
+								<SupportModal />
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+
 			<CreatePostModal
 				isOpen={isModalOpen}
 				closeModal={closeModal}

@@ -5,6 +5,7 @@ import { Textarea } from './ui/Textarea'
 import Input from './ui/Input'
 import { X } from 'lucide-react'
 import axiosInstance from '../api/axiosInstance'
+import { toast } from 'react-toastify'
 
 interface CreatePostModalProps {
 	isOpen: boolean
@@ -64,6 +65,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 				closeModal()
 				resetForm()
 				fetchPosts()
+				toast.success('Публцікацію створено успішно')
 			} catch (error) {
 				console.error('Не вдалося створити пост', error)
 			}
@@ -72,8 +74,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
 	return (
 		<Dialog.Root open={isOpen} onOpenChange={closeModal}>
-			<Dialog.Overlay className="fixed inset-0 bg-black/30" />
-			<Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#f1f5f9] p-8 rounded-lg shadow-lg max-w-2xl w-full">
+			<Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
+			<Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-xl focus:outline-none">
 				<Dialog.Title className="text-2xl font-bold mb-4">
 					Створити публікацію
 				</Dialog.Title>

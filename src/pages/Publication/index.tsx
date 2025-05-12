@@ -18,26 +18,33 @@ const Publication = () => {
 	const [publication, setPublication] = useState<any>(null)
 	const [liked, setLiked] = useState<boolean>(false)
 	const [likeCount, setLikeCount] = useState<number>(0)
-	const [loading, setLoading] = useState<boolean>(false)
+	const [loading, setLoading] = useState<boolean>(true)
 	const [error, setError] = useState<string | null>(null)
 
-	useEffect(() => {
-		const fetchPost = async () => {
-			try {
-				const response = await postService.getById(id!)
-				const post = response[0]
-				setPublication(post)
-				setLikeCount(post.like_count)
-				setLiked(post.has_reaction && post.reaction_type === 'LIKE')
-			} catch (err) {
-				setError('Не вдалося завантажити публікацію.')
-			} finally {
-				setLoading(false)
-			}
-		}
+	const fetchPost = async () => {
+		try {
+			const response = await postService.getById(id!)
 
+			const post = response[0]
+			setPublication(post)
+			setLikeCount(post.like_count)
+			setLiked(post.has_reaction && post.reaction_type === 'LIKE')
+		} catch (err) {
+			setError('Не вдалося завантажити публікацію.')
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	useEffect(() => {
 		fetchPost()
 	}, [id])
+
+	useEffect(() => {
+		const handler = () => fetchPost()
+		window.addEventListener('commentAdded', handler)
+		return () => window.removeEventListener('commentAdded', handler)
+	}, [])
 
 	const handleToggleLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault()
@@ -56,7 +63,13 @@ const Publication = () => {
 		}
 	}
 
-	if (loading) return <div className="p-4 text-center">Завантаження...</div>
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center h-64">
+				<div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+			</div>
+		)
+	}
 	if (error) return <div className="p-4 text-center text-red-500">{error}</div>
 	if (!publication) return null
 
@@ -155,7 +168,10 @@ const Publication = () => {
 							<h2 className="text-xl font-bold mb-4">
 								Коментарі ({publication.comment_count})
 							</h2>
-							<PublicationComments publicationId={publication.id} />
+							<PublicationComments
+								publicationId={publication.id}
+								comments={publication.comments}
+							/>
 						</div>
 					</div>
 
