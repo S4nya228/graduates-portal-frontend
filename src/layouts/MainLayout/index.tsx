@@ -15,10 +15,10 @@ import Notifications from '../../pages/Notification'
 
 function MainLayout() {
 	return (
-		<>
+		<div className="min-h-screen flex flex-col">
 			<Header />
 			<ScrollToTop />
-			<main>
+			<main className="flex-grow">
 				<Routes>
 					<Route index element={<Home />} />
 					<Route path="/login" element={<Login />} />
@@ -32,7 +32,7 @@ function MainLayout() {
 				</Routes>
 			</main>
 			<Footer />
-		</>
+		</div>
 	)
 }
 
