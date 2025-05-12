@@ -3,15 +3,6 @@ import SearchFilters, {
 	SearchFilters as SearchFiltersType,
 } from '../../components/SearchFilter'
 import ProfileCard from '../../components/ProfileCard'
-import {
-	Pagination,
-	PaginationContent,
-	PaginationEllipsis,
-	PaginationItem,
-	PaginationLink,
-	PaginationNext,
-	PaginationPrevious,
-} from '../../components/Pagination'
 import Button from '../../components/ui/Button'
 
 const mockAlumniData = [
@@ -185,30 +176,6 @@ const SearchAlumni = () => {
 						))}
 					</div>
 				)}
-
-				<div className="mt-8 flex justify-center">
-					<Pagination>
-						<PaginationContent>
-							<PaginationPrevious />
-							<PaginationItem>
-								<PaginationLink href="#">1</PaginationLink>
-							</PaginationItem>
-							<PaginationItem>
-								<PaginationLink href="#" isActive>
-									2
-								</PaginationLink>
-							</PaginationItem>
-							<PaginationItem>
-								<PaginationLink href="#">3</PaginationLink>
-							</PaginationItem>
-							<PaginationEllipsis />
-							<PaginationItem>
-								<PaginationLink href="#">10</PaginationLink>
-							</PaginationItem>
-							<PaginationNext />
-						</PaginationContent>
-					</Pagination>
-				</div>
 			</div>
 		</div>
 	)
