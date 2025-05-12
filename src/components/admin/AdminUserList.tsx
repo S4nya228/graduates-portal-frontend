@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	Table,
 	TableBody,
@@ -19,56 +19,36 @@ import Input from '../ui/Input'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
 import CreateUserModal from './CreateUserModal'
+import userService from '../../services/userService'
+import { User } from '../../types'
 
 const AdminUserList = () => {
 	const [searchQuery, setSearchQuery] = useState('')
-	const users = [
-		{
-			id: '1',
-			name: 'Олексій Ковальчук',
-			email: 'oleksii.kovalchuk@example.com',
-			graduationYear: 2019,
-			specialization: 'Програмна інженерія',
-			status: 'active',
-			registrationDate: '10.05.2023',
-		},
-		{
-			id: '2',
-			name: 'Марія Петренко',
-			email: 'maria.petrenko@example.com',
-			graduationYear: 2018,
-			specialization: "Комп'ютерні науки",
-			status: 'pending',
-			registrationDate: '15.05.2023',
-		},
-		{
-			id: '3',
-			name: 'Іван Мельник',
-			email: 'ivan.melnyk@example.com',
-			graduationYear: 2020,
-			specialization: 'Кібербезпека',
-			status: 'active',
-			registrationDate: '05.06.2023',
-		},
-		{
-			id: '4',
-			name: 'Софія Коваленко',
-			email: 'sofia.kovalenko@example.com',
-			graduationYear: 2017,
-			specialization: 'Програмна інженерія',
-			status: 'active',
-			registrationDate: '22.06.2023',
-		},
-		{
-			id: '5',
-			name: 'Максим Шевченко',
-			email: 'maxim.shevchenko@example.com',
-			graduationYear: 2021,
-			specialization: 'Штучний інтелект',
-			status: 'inactive',
-			registrationDate: '30.06.2023',
-		},
-	]
+	const [users, setUsers] = useState<User[]>([])
+	const [loading, setLoading] = useState<boolean>(true)
+
+	const fetchUsers = async () => {
+		try {
+			const data = await userService.getAll()
+			setUsers(data)
+		} catch (error) {
+			console.error('Не вдалося завантажити користувачів:', error)
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	useEffect(() => {
+		fetchUsers()
+	}, [])
+
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center h-64">
+				<div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+			</div>
+		)
+	}
 
 	const renderStatusBadge = (status: string) => {
 		switch (status) {
@@ -129,7 +109,7 @@ const AdminUserList = () => {
 								<TableRow key={user.id}>
 									<TableCell className="font-medium">{user.name}</TableCell>
 									<TableCell>{user.email}</TableCell>
-									<TableCell>{user.graduationYear}</TableCell>
+									<TableCell>{user.graduation_at}</TableCell>
 									<TableCell>{renderStatusBadge(user.status)}</TableCell>
 									<TableCell>
 										<div className="flex space-x-2">
@@ -145,13 +125,6 @@ const AdminUserList = () => {
 													<CheckCircle className="h-4 w-4" />
 												</Button>
 											)}
-											<Button
-												variant="ghost"
-												size="sm"
-												className="text-red-500"
-											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
 										</div>
 									</TableCell>
 								</TableRow>

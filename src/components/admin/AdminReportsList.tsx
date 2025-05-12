@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	Table,
 	TableBody,
@@ -25,37 +25,33 @@ import {
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
+import { fetchSupportRequests } from '../../services/supportService'
 
 const AdminReportList = () => {
-	const reports = [
-		{
-			id: '1',
-			type: 'post',
-			targetId: '4',
-			reporter: 'Максим Шевченко',
-			reason: 'Спам/Реклама',
-			date: '05.07.2023',
-			status: 'pending',
-		},
-		{
-			id: '2',
-			type: 'comment',
-			targetId: '7',
-			reporter: 'Софія Коваленко',
-			reason: 'Образливий контент',
-			date: '04.07.2023',
-			status: 'pending',
-		},
-		{
-			id: '3',
-			type: 'user',
-			targetId: '12',
-			reporter: 'Олексій Ковальчук',
-			reason: 'Фейковий акаунт',
-			date: '03.07.2023',
-			status: 'resolved',
-		},
-	]
+	const [reports, setReports] = useState<any[]>([])
+	const [loading, setLoading] = useState<boolean>(true)
+
+	useEffect(() => {
+		const loadReports = async () => {
+			try {
+				const data = await fetchSupportRequests()
+				setReports(data)
+			} catch (error) {
+				console.error('Error fetching support requests:', error)
+			} finally {
+				setLoading(false)
+			}
+		}
+		loadReports()
+	}, [])
+
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center h-64">
+				<div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+			</div>
+		)
+	}
 
 	const renderStatusBadge = (status: string) => {
 		switch (status) {
@@ -106,9 +102,11 @@ const AdminReportList = () => {
 											? 'Коментар'
 											: 'Користувач'}
 									</TableCell>
-									<TableCell>{report.reporter}</TableCell>
-									<TableCell>{report.reason}</TableCell>
-									<TableCell>{report.date}</TableCell>
+									<TableCell>{report.author.name}</TableCell>
+									<TableCell>{report.title}</TableCell>
+									<TableCell>
+										{new Date(report.created_at).toLocaleDateString()}
+									</TableCell>
 									<TableCell>{renderStatusBadge(report.status)}</TableCell>
 									<TableCell>
 										<div className="flex space-x-2">

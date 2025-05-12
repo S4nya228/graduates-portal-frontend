@@ -4,6 +4,8 @@ import { User } from '../types'
 interface Service {
 	current: () => Promise<User | undefined>
 	cabinet: () => Promise<User | undefined>
+	updateCabinet: (data: Partial<User> | FormData) => Promise<User | undefined>
+	getAll: () => Promise<User[]>
 }
 
 export default <Service>{
@@ -22,6 +24,31 @@ export default <Service>{
 			return response.data
 		} catch (e: any) {
 			console.log(e?.response?.data)
+		}
+	},
+
+	async updateCabinet(data: Partial<User> | FormData) {
+		try {
+			const isFormData = data instanceof FormData
+			const response = await axiosInstance.post<User>('/user/cabinet', data, {
+				headers: {
+					'Content-Type': isFormData
+						? 'multipart/form-data'
+						: 'application/json',
+				},
+			})
+			return response.data
+		} catch (e: any) {
+			console.log(e?.response?.data)
+		}
+	},
+	async getAll(): Promise<User[]> {
+		try {
+			const response = await axiosInstance.get<User[]>('/admin/user')
+			return response.data
+		} catch (e: any) {
+			console.log(e?.response?.data)
+			return []
 		}
 	},
 }

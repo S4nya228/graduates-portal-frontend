@@ -17,6 +17,7 @@ interface Post {
 interface PostService {
 	like: (postId: number) => Promise<void>
 	getById: (id: string) => Promise<Post[]>
+	getAll: () => Promise<Post[]>
 }
 
 const postService: PostService = {
@@ -34,6 +35,15 @@ const postService: PostService = {
 			return response.data
 		} catch (e: any) {
 			console.error('Помилка при отриманні поста:', e?.response?.data)
+			throw e
+		}
+	},
+	async getAll() {
+		try {
+			const response = await axiosInstance.get('/post')
+			return response.data
+		} catch (e: any) {
+			console.error('Помилка при отриманні постів:', e?.response?.data)
 			throw e
 		}
 	},

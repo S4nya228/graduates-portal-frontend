@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	Table,
 	TableBody,
@@ -18,46 +18,34 @@ import { CheckCircle, Edit, MessageSquare, Search, Trash2 } from 'lucide-react'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
+import postService from '../../services/postService'
 
 const AdminPostList = () => {
-	const posts = [
-		{
-			id: '1',
-			title: 'Зустріч випускників 2018 року',
-			author: 'Анна Коваленко',
-			date: '02.07.2023',
-			status: 'published',
-			comments: 5,
-			likes: 24,
-		},
-		{
-			id: '2',
-			title: 'Вакансії для випускників',
-			author: 'Олег Петренко',
-			date: '03.07.2023',
-			status: 'published',
-			comments: 8,
-			likes: 15,
-		},
-		{
-			id: '3',
-			title: 'Досвід роботи в Google',
-			author: 'Марія Іваненко',
-			date: '01.07.2023',
-			status: 'published',
-			comments: 14,
-			likes: 32,
-		},
-		{
-			id: '4',
-			title: 'Конфіденційний контент',
-			author: 'Іван Мельник',
-			date: '05.07.2023',
-			status: 'flagged',
-			comments: 3,
-			likes: 7,
-		},
-	]
+	const [posts, setPosts] = useState<any[]>([])
+	const [loading, setLoading] = useState<boolean>(true)
+
+	const fetchPosts = async () => {
+		try {
+			const response = await postService.getById('')
+			setPosts(response)
+		} catch (e) {
+			console.error('Помилка при отриманні постів:', e)
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	useEffect(() => {
+		fetchPosts()
+	}, [])
+
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center h-64">
+				<div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+			</div>
+		)
+	}
 
 	const renderStatusBadge = (status: string) => {
 		switch (status) {
@@ -111,17 +99,20 @@ const AdminPostList = () => {
 							{posts.map((post) => (
 								<TableRow key={post.id}>
 									<TableCell className="font-medium">{post.title}</TableCell>
-									<TableCell>{post.author}</TableCell>
-									<TableCell>{post.date}</TableCell>
+									<TableCell>{post.user_name}</TableCell>
+									<TableCell>
+										{new Date(post.created_at).toLocaleDateString()}
+									</TableCell>
 									<TableCell>{renderStatusBadge(post.status)}</TableCell>
 									<TableCell>
 										<div className="flex items-center space-x-2">
 											<span className="flex items-center text-[hsl(215.4,16.3%,46.9%)]">
 												<MessageSquare className="h-4 w-4 mr-1" />{' '}
-												{post.comments}
+												{post.comment_count}
 											</span>
 											<span className="flex items-center text-[hsl(215.4,16.3%,46.9%)]">
-												<CheckCircle className="h-4 w-4 mr-1" /> {post.likes}
+												<CheckCircle className="h-4 w-4 mr-1" />{' '}
+												{post.like_count}
 											</span>
 										</div>
 									</TableCell>
