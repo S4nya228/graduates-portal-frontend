@@ -21,25 +21,43 @@ import {
 	Twitter,
 } from 'lucide-react'
 import userService from '../../services/userService'
+import EditProfileModal from '../../components/EditProfileModal'
+import NewsCard from '../../components/NewsCard'
+import { Link } from 'react-router-dom'
 
 const Profile = () => {
 	const [profileData, setProfileData] = useState<any>(null)
+	const [isEditOpen, setIsEditOpen] = useState(false)
+	const [loading, setLoading] = useState<boolean>(true)
 
 	useEffect(() => {
 		const fetchUserData = async () => {
 			try {
-				const profile = await userService.current()
+				const profile = await userService.cabinet()
 				setProfileData(profile)
 			} catch (e) {
 				console.error('Помилка при отриманні даних профілю:', e)
+			} finally {
+				setLoading(false)
 			}
 		}
 
 		fetchUserData()
 	}, [])
 
-	if (!profileData) {
-		return <div>Завантаження...</div>
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center h-64">
+				<div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+			</div>
+		)
+	}
+
+	const graduationDegreesMap: Record<string, string> = {
+		A: 'Немає',
+		B: 'Бакалавр',
+		C: 'Магістр',
+		D: 'Доктор наук',
 	}
 
 	return (
@@ -64,13 +82,13 @@ const Profile = () => {
 								<div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
 									<div>
 										<h1 className="text-2xl font-bold">{profileData.name}</h1>
-										<p className="text-alumni-gray">
-											{profileData.currentPosition} в {profileData.company}
-										</p>
 									</div>
 
 									<div className="flex gap-2">
-										<Button className="bg-alumni-purple">
+										<Button
+											className="bg-alumni-purple"
+											onClick={() => setIsEditOpen(true)}
+										>
 											<Edit className="mr-2 h-4 w-4" />
 											Редагувати профіль
 										</Button>
@@ -100,44 +118,49 @@ const Profile = () => {
 									<div className="flex items-center text-alumni-gray">
 										<GraduationCap className="h-4 w-4 mr-2" />
 										<span>
-											Випускник {profileData.graduationYear} року,{' '}
-											{profileData.specialization}
+											Випускник {profileData.graduated_at} року,{' '}
+											{profileData.specialty}
 										</span>
 									</div>
 								</div>
 
 								<div className="mt-4 flex gap-3">
-									{profileData.socialLinks && (
-										<a
-											href={profileData.socialLinks}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="text-alumni-gray hover:text-[#3b82f6] transition-colors"
-										>
-											<Linkedin className="h-5 w-5" />
-										</a>
-									)}
+									{profileData.social_links?.map(
+										(
+											item: { platform: string; link: string },
+											index: number
+										) => {
+											if (!item.link) return null
 
-									{profileData.socialLinks && (
-										<a
-											href={profileData.socialLinks}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="text-alumni-gray hover:text-[#3b82f6] transition-colors"
-										>
-											<Github className="h-5 w-5" />
-										</a>
-									)}
+											const platform = item.platform
 
-									{profileData.socialLinks && (
-										<a
-											href={profileData.socialLinks}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="text-alumni-gray hover:text-[#3b82f6] transition-colors"
-										>
-											<Twitter className="h-5 w-5" />
-										</a>
+											let Icon
+											switch (platform) {
+												case 'linkedin':
+													Icon = Linkedin
+													break
+												case 'github':
+													Icon = Github
+													break
+												case 'twitter':
+													Icon = Twitter
+													break
+												default:
+													return null
+											}
+
+											return (
+												<a
+													key={index}
+													href={item.link}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="text-alumni-gray hover:text-[#3b82f6] transition-colors"
+												>
+													<Icon className="h-5 w-5" />
+												</a>
+											)
+										}
 									)}
 								</div>
 							</div>
@@ -166,16 +189,15 @@ const Profile = () => {
 							<CardContent className="p-6">
 								<h2 className="text-xl font-semibold mb-3">Про мене</h2>
 								<p className="text-gray-600">{profileData.about}</p>
-
 								<div className="mt-6">
 									<h3 className="font-medium mb-3">Навички</h3>
 									<div className="flex flex-wrap gap-2">
 										{profileData.skills &&
 										Array.isArray(profileData.skills) &&
 										profileData.skills.length > 0 ? (
-											profileData.skills.map((skill: string, index: number) => (
-												<Badge key={index} variant="secondary">
-													{skill}
+											profileData.skills.map((skill: any) => (
+												<Badge key={skill.id} variant="secondary">
+													{skill.name}
 												</Badge>
 											))
 										) : (
@@ -191,7 +213,7 @@ const Profile = () => {
 									profileData.projects.length > 0 ? (
 										profileData.projects.map((project: any, index: number) => (
 											<div key={index} className="mb-4 last:mb-0">
-												<h4 className="font-medium">{project.name}</h4>
+												<h4 className="font-medium">{project.title}</h4>
 												<p className="text-gray-600">{project.description}</p>
 											</div>
 										))
@@ -225,15 +247,13 @@ const Profile = () => {
 													<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mb-2">
 														<h3 className="font-medium">{exp.position}</h3>
 														<span className="text-sm text-alumni-gray">
-															{exp.startDate} - {exp.endDate}
+															{exp.start_experience} - {exp.end_experience}
 														</span>
 													</div>
 
 													<div className="flex items-center text-alumni-gray mb-2">
 														<Building className="h-4 w-4 mr-2" />
-														<span>
-															{exp.company}, {exp.location}
-														</span>
+														<span>{exp.company}</span>
 													</div>
 
 													<p className="text-gray-600">{exp.description}</p>
@@ -252,14 +272,13 @@ const Profile = () => {
 						<Card>
 							<CardContent className="p-6">
 								<h2 className="text-xl font-semibold mb-6">Освіта</h2>
-
 								<div className="space-y-8">
-									{profileData.education &&
-									Array.isArray(profileData.education) &&
-									profileData.education.length > 0 ? (
-										profileData.education.map((edu: any, index: number) => (
+									{profileData.graduation &&
+									Array.isArray(profileData.graduation) &&
+									profileData.graduation.length > 0 ? (
+										profileData.graduation.map((edu: any, index: number) => (
 											<div key={index} className="relative pl-8 pb-8">
-												{index !== profileData.education.length - 1 && (
+												{index !== profileData.graduation.length - 1 && (
 													<div className="absolute top-0 left-3 h-full w-px bg-gray-200"></div>
 												)}
 												<div className="absolute top-0 left-0 h-6 w-6 rounded-full bg-alumni-purple flex items-center justify-center">
@@ -268,18 +287,32 @@ const Profile = () => {
 
 												<div>
 													<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mb-2">
-														<h3 className="font-medium">{edu.degree}</h3>
+														<h3 className="font-medium">
+															{graduationDegreesMap[edu.degree] ?? 'Не вказано'}
+														</h3>
 														<span className="text-sm text-alumni-gray">
-															{edu.startDate} - {edu.endDate}
+															{edu.start_graduation
+																? new Date(edu.start_graduation).getFullYear()
+																: '??'}{' '}
+															-{' '}
+															{edu.end_graduation
+																? new Date(edu.end_graduation).getFullYear()
+																: '??'}
 														</span>
 													</div>
 
 													<div className="flex items-center text-alumni-gray mb-2">
 														<Building className="h-4 w-4 mr-2" />
-														<span>{edu.institution}</span>
+														<span>
+															{edu.university ??
+																edu.faculty ??
+																'Навчальний заклад не вказано'}
+														</span>
 													</div>
 
-													<p className="text-gray-600">{edu.field}</p>
+													<p className="text-gray-600">
+														{edu.specialty ?? 'Спеціальність не вказано'}
+													</p>
 												</div>
 											</div>
 										))
@@ -295,15 +328,26 @@ const Profile = () => {
 						<Card>
 							<CardContent className="p-6">
 								<h2 className="text-xl font-semibold mb-4">Мої публікації</h2>
-
-								{/* {userPosts.map((post: any) => (
-									<NewsCard key={post.id} {...post} />
-								))} */}
+								{profileData.posts.map((post: any) => (
+									<Link to={`/publication/${post.id}`} key={post.id}>
+										<NewsCard post={post} />
+									</Link>
+								))}
 							</CardContent>
 						</Card>
 					</TabsContent>
 				</Tabs>
 			</div>
+			{isEditOpen && (
+				<EditProfileModal
+					isOpen={isEditOpen}
+					closeModal={() => setIsEditOpen(false)}
+					initialData={profileData}
+					refreshUserData={() => {
+						userService.cabinet().then((updated) => setProfileData(updated))
+					}}
+				/>
+			)}
 		</div>
 	)
 }
