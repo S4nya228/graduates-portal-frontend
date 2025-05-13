@@ -1,28 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/Avatar'
 import Button from './ui/Button'
 import { Card } from './Card'
 import { Heart } from 'lucide-react'
-
-interface Comment {
-	id: number
-	content: string
-	created_at: string
-	parent_id: number | null
-	root_id: number | null
-	user_id: number
-	user?: {
-		name: string
-		avatar: string | null
-	}
-	likes?: number
-}
+import type { Comment } from '../services/commentService'
+import commentService from '../services/commentService'
+import clsx from 'clsx'
 
 interface CommentListProps {
 	comments: Comment[]
+	postId: number
 }
 
-const CommentList: React.FC<CommentListProps> = ({ comments }) => {
+const CommentList: React.FC<CommentListProps> = ({ comments, postId }) => {
+	const [localComments, setLocalComments] = useState<Comment[]>(comments)
+
+	useEffect(() => {
+		setLocalComments(comments)
+	}, [comments])
+
 	const formatDate = (isoDate: string) =>
 		new Date(isoDate).toLocaleDateString('uk-UA', {
 			year: 'numeric',
@@ -30,9 +26,29 @@ const CommentList: React.FC<CommentListProps> = ({ comments }) => {
 			day: '2-digit',
 		})
 
+	const handleLike = async (commentId: number) => {
+		try {
+			await commentService.toggleLike(postId, commentId)
+			setLocalComments((prev) =>
+				prev.map((comment) =>
+					comment.id === commentId
+						? {
+								...comment,
+								has_reaction: !comment.has_reaction,
+								like_count:
+									(comment.like_count ?? 0) + (comment.has_reaction ? -1 : 1),
+						  }
+						: comment
+				)
+			)
+		} catch (error) {
+			console.error('Не вдалося лайкнути коментар')
+		}
+	}
+
 	return (
 		<div className="space-y-6">
-			{comments.map((comment) => (
+			{localComments.map((comment) => (
 				<Card key={comment.id} className="p-4">
 					<div className="flex gap-3">
 						<Avatar>
@@ -46,9 +62,16 @@ const CommentList: React.FC<CommentListProps> = ({ comments }) => {
 							</p>
 							<p className="mt-2">{comment.content}</p>
 							<div className="flex items-center space-x-4 mt-2">
-								<Button variant="ghost" size="sm" className="gap-1 h-8 px-2">
-									<Heart className="w-4 h-4" />
-									<span>{comment.likes ?? 0}</span>
+								<Button
+									variant="ghost"
+									size="sm"
+									className={clsx('gap-1 h-8 px-2', {
+										'text-red-500': comment.has_reaction,
+									})}
+									onClick={() => handleLike(comment.id)}
+								>
+									<Heart className="w-4 h-4 fill-current" />
+									<span>{comment.like_count ?? 0}</span>
 								</Button>
 							</div>
 						</div>

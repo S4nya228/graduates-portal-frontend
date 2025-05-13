@@ -12,7 +12,8 @@ export interface Comment {
 		name: string
 		avatar: string | null
 	}
-	likes?: number
+	like_count?: number
+	has_reaction: boolean
 }
 
 interface CommentPayload {
@@ -26,10 +27,18 @@ const commentService = {
 				`/post/${postId}/comment`,
 				data
 			)
-
 			return response.data
 		} catch (e: any) {
 			console.error('Помилка при створенні коментаря:', e.response?.data)
+			throw e
+		}
+	},
+
+	async toggleLike(postId: number, commentId: number): Promise<void> {
+		try {
+			await axiosInstance.post(`/post/${postId}/comment/${commentId}/like`)
+		} catch (e: any) {
+			console.error('Помилка при лайкуванні коментаря:', e.response?.data)
 			throw e
 		}
 	},

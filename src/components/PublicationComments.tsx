@@ -2,21 +2,10 @@ import React, { useState } from 'react'
 import CommentForm from './CommentForm'
 import CommentList from './CommentList'
 import commentService from '../services/commentService'
-
-interface Comment {
-	id: number
-	content: string
-	created_at: string
-	parent_id: number | null
-	root_id: number | null
-	user_id: number
-	user_name?: string
-	user_avatar?: string | null
-	likes?: number
-}
+import type { Comment } from '../services/commentService'
 
 interface PublicationCommentsProps {
-	publicationId: string
+	publicationId: number
 	comments: Comment[]
 }
 
@@ -39,7 +28,7 @@ const PublicationComments: React.FC<PublicationCommentsProps> = ({
 	return (
 		<div>
 			<CommentForm onSubmit={handleCreateComment} />
-			<CommentList comments={comments} />
+			<CommentList postId={publicationId} comments={comments} />
 		</div>
 	)
 }
