@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar'
 import Button from '../../components/ui/Button'
-import Badge from '../../components/ui/Badge'
 import {
 	Card,
 	CardContent,
 	CardFooter,
 	CardHeader,
 } from '../../components/Card'
-import { ChevronLeft, Heart, MessageSquare, Calendar, User } from 'lucide-react'
+import { ChevronLeft, Heart, MessageSquare } from 'lucide-react'
 import PublicationComments from '../../components/PublicationComments'
 import postService from '../../services/postService'
 
@@ -93,7 +92,6 @@ const Publication = () => {
 						<span>Назад на головну</span>
 					</Link>
 				</div>
-
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 					<div className="lg:col-span-2">
 						<Card className="overflow-hidden bg-white shadow-md">
@@ -117,7 +115,6 @@ const Publication = () => {
 										)}
 										<AvatarFallback>{publication.user_name[0]}</AvatarFallback>
 									</Avatar>
-
 									<div>
 										<div className="font-medium">{publication.user_name}</div>
 										<div className="text-sm text-[hsl(215.4,16.3%,46.9%)] flex items-center">
@@ -126,7 +123,6 @@ const Publication = () => {
 									</div>
 								</div>
 							</CardHeader>
-
 							<CardContent className="pt-6 px-6">
 								<h1 className="text-2xl md:text-3xl font-bold mb-2">
 									{publication.title}
@@ -174,7 +170,6 @@ const Publication = () => {
 							/>
 						</div>
 					</div>
-
 					<div className="lg:col-span-1">
 						<div className="sticky top-20">
 							<div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -189,7 +184,6 @@ const Publication = () => {
 										)}
 										<AvatarFallback>{publication.user_name[0]}</AvatarFallback>
 									</Avatar>
-
 									<div>
 										<div className="font-bold text-lg">
 											{publication.user_name}
@@ -200,9 +194,11 @@ const Publication = () => {
 									Інформація про автора публікації.
 								</p>
 								<div className="mt-4">
-									<Button variant="outline" className="w-full">
-										Переглянути профіль
-									</Button>
+									<Link to={`/profile/${publication.user_id}`}>
+										<Button variant="outline" className="w-full">
+											Переглянути профіль
+										</Button>
+									</Link>
 								</div>
 							</div>
 						</div>

@@ -18,6 +18,7 @@ interface PostService {
 	like: (postId: number) => Promise<void>
 	getById: (id: string) => Promise<Post[]>
 	getAll: () => Promise<Post[]>
+	remove: (id: number) => Promise<void>
 }
 
 const postService: PostService = {
@@ -44,6 +45,14 @@ const postService: PostService = {
 			return response.data
 		} catch (e: any) {
 			console.error('Помилка при отриманні постів:', e?.response?.data)
+			throw e
+		}
+	},
+	async remove(id) {
+		try {
+			await axiosInstance.delete(`/post/${id}`)
+		} catch (e: any) {
+			console.error('Помилка при видаленні поста:', e?.response?.data)
 			throw e
 		}
 	},

@@ -19,19 +19,38 @@ import Input from '../ui/Input'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
 import postService from '../../services/postService'
+import ConfirmDialog from '../ConfirmDialog'
+import { toast } from 'react-toastify'
 
 const AdminPostList = () => {
 	const [posts, setPosts] = useState<any[]>([])
 	const [loading, setLoading] = useState<boolean>(true)
+	const [deleteId, setDeleteId] = useState<number | null>(null)
+	const [isDeleting, setIsDeleting] = useState(false)
 
 	const fetchPosts = async () => {
 		try {
-			const response = await postService.getById('')
+			const response = await postService.getAll()
 			setPosts(response)
 		} catch (e) {
 			console.error('Помилка при отриманні постів:', e)
 		} finally {
 			setLoading(false)
+		}
+	}
+
+	const handleDeleteConfirm = async () => {
+		if (!deleteId) return
+		setIsDeleting(true)
+		try {
+			await postService.remove(deleteId)
+			toast.success('Публікацію успішно видалено')
+			setDeleteId(null)
+			await fetchPosts()
+		} catch (e) {
+			toast.error('Помилка при видаленні публікації')
+		} finally {
+			setIsDeleting(false)
 		}
 	}
 
@@ -67,6 +86,7 @@ const AdminPostList = () => {
 				return <Badge>{status}</Badge>
 		}
 	}
+
 	return (
 		<Card>
 			<CardHeader>
@@ -107,11 +127,11 @@ const AdminPostList = () => {
 									<TableCell>
 										<div className="flex items-center space-x-2">
 											<span className="flex items-center text-[hsl(215.4,16.3%,46.9%)]">
-												<MessageSquare className="h-4 w-4 mr-1" />{' '}
+												<MessageSquare className="h-4 w-4 mr-1" />
 												{post.comment_count}
 											</span>
 											<span className="flex items-center text-[hsl(215.4,16.3%,46.9%)]">
-												<CheckCircle className="h-4 w-4 mr-1" />{' '}
+												<CheckCircle className="h-4 w-4 mr-1" />
 												{post.like_count}
 											</span>
 										</div>
@@ -125,6 +145,7 @@ const AdminPostList = () => {
 												variant="ghost"
 												size="sm"
 												className="text-red-500"
+												onClick={() => setDeleteId(post.id)}
 											>
 												<Trash2 className="h-4 w-4" />
 											</Button>
@@ -136,6 +157,15 @@ const AdminPostList = () => {
 					</Table>
 				</div>
 			</CardContent>
+			<ConfirmDialog
+				open={deleteId !== null}
+				title="Видалення публікації"
+				description="Ви дійсно хочете видалити цю публікацію? Цю дію неможливо скасувати."
+				onConfirm={handleDeleteConfirm}
+				onCancel={() => setDeleteId(null)}
+				loading={isDeleting}
+				confirmText="Видалити"
+			/>
 		</Card>
 	)
 }

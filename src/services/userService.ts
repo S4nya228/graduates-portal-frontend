@@ -6,6 +6,7 @@ interface Service {
 	cabinet: () => Promise<User | undefined>
 	updateCabinet: (data: Partial<User> | FormData) => Promise<User | undefined>
 	getAll: () => Promise<User[]>
+	create: (data: Partial<User> | FormData) => Promise<User | undefined>
 }
 
 export default <Service>{
@@ -49,6 +50,21 @@ export default <Service>{
 		} catch (e: any) {
 			console.log(e?.response?.data)
 			return []
+		}
+	},
+	async create(data: Partial<User> | FormData) {
+		try {
+			const isFormData = data instanceof FormData
+			const response = await axiosInstance.post<User>('/admin/user', data, {
+				headers: {
+					'Content-Type': isFormData
+						? 'multipart/form-data'
+						: 'application/json',
+				},
+			})
+			return response.data
+		} catch (e: any) {
+			console.log(e?.response?.data)
 		}
 	},
 }
