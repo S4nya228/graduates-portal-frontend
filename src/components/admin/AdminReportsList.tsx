@@ -14,22 +14,31 @@ import {
 	CardHeader,
 	CardTitle,
 } from '../Card'
-import {
-	CheckCircle,
-	Edit,
-	MessageSquare,
-	Search,
-	Trash2,
-	XCircle,
-} from 'lucide-react'
-import Input from '../ui/Input'
+import { CheckCircle, LucideMessageCirclePlus, XCircle } from 'lucide-react'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
 import { fetchSupportRequests } from '../../services/supportService'
+import SupportReplyModal from './SupportReplyModal'
 
 const AdminReportList = () => {
 	const [reports, setReports] = useState<any[]>([])
 	const [loading, setLoading] = useState<boolean>(true)
+	const [selectedId, setSelectedId] = useState<number | null>(null)
+	const [modalOpen, setModalOpen] = useState(false)
+
+	const handleReplyClick = (id: number) => {
+		setSelectedId(id)
+		setModalOpen(true)
+	}
+
+	const updateReports = async () => {
+		try {
+			const data = await fetchSupportRequests()
+			setReports(data)
+		} catch (error) {
+			console.error('Error fetching support requests:', error)
+		}
+	}
 
 	useEffect(() => {
 		const loadReports = async () => {
@@ -55,22 +64,21 @@ const AdminReportList = () => {
 
 	const renderStatusBadge = (status: string) => {
 		switch (status) {
-			case 'pending':
-				return <Badge className="bg-yellow-500">Очікує підтвердження</Badge>
-			case 'inactive':
-				return <Badge className="bg-gray-500">Неактивний</Badge>
-			case 'published':
-				return <Badge className="bg-green-500">Опубліковано</Badge>
-			case 'draft':
-				return <Badge className="bg-gray-500">Чернетка</Badge>
-			case 'flagged':
-				return <Badge className="bg-red-500">Позначено</Badge>
-			case 'resolved':
-				return <Badge className="bg-green-500">Вирішено</Badge>
+			case 'A':
+				return <Badge className="bg-yellow-500">Нова</Badge>
+			case 'B':
+				return <Badge className="bg-blue-500">В обробці</Badge>
+			case 'C':
+				return <Badge className="bg-green-500">Схвалено</Badge>
+			case 'D':
+				return <Badge className="bg-red-500">Відхилено</Badge>
+			case 'F':
+				return <Badge className="bg-orange-500">Повторно відкрито</Badge>
 			default:
 				return <Badge>{status}</Badge>
 		}
 	}
+
 	return (
 		<Card>
 			<CardHeader>
@@ -103,16 +111,21 @@ const AdminReportList = () => {
 											: 'Користувач'}
 									</TableCell>
 									<TableCell>{report.author.name}</TableCell>
-									<TableCell>{report.title}</TableCell>
+									<TableCell className="max-w-100">{report.title}</TableCell>
 									<TableCell>
 										{new Date(report.created_at).toLocaleDateString()}
 									</TableCell>
 									<TableCell>{renderStatusBadge(report.status)}</TableCell>
 									<TableCell>
 										<div className="flex space-x-2">
-											<Button variant="ghost" size="sm">
-												<Edit className="h-4 w-4" />
+											<Button
+												variant="ghost"
+												size="sm"
+												onClick={() => handleReplyClick(report.id)}
+											>
+												<LucideMessageCirclePlus className="h-5 w-5" />
 											</Button>
+
 											{report.status === 'pending' && (
 												<>
 													<Button
@@ -139,6 +152,12 @@ const AdminReportList = () => {
 					</Table>
 				</div>
 			</CardContent>
+			<SupportReplyModal
+				open={modalOpen}
+				onClose={() => setModalOpen(false)}
+				reportId={selectedId}
+				onUpdate={updateReports}
+			/>
 		</Card>
 	)
 }

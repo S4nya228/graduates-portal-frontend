@@ -38,3 +38,11 @@ export interface User {
 	created_at: string
 	updated_at: string
 }
+
+export interface SupportRequest {
+	id: number
+	title: string
+	appeal: string
+	reply: string | null
+	status: 'A' | 'B' | 'C' | 'D' | 'F'
+}
