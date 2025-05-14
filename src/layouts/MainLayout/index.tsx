@@ -12,6 +12,7 @@ import Publication from '../../pages/Publication'
 import Events from '../../pages/Events'
 import ScrollToTop from '../../components/ScrollToTop'
 import Notifications from '../../pages/Notification'
+import RedirectIfAuthenticated from '../../components/RedirectIfAuthenticated'
 
 function MainLayout() {
 	return (
@@ -21,8 +22,22 @@ function MainLayout() {
 			<main className="flex-grow">
 				<Routes>
 					<Route index element={<Home />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/register" element={<Register />} />
+					<Route
+						path="/login"
+						element={
+							<RedirectIfAuthenticated>
+								<Login />
+							</RedirectIfAuthenticated>
+						}
+					/>
+					<Route
+						path="/register"
+						element={
+							<RedirectIfAuthenticated>
+								<Register />
+							</RedirectIfAuthenticated>
+						}
+					/>
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/search" element={<SearchAlumni />} />
 					<Route path="/publication/:id" element={<Publication />} />
