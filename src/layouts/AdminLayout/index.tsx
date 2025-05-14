@@ -9,7 +9,7 @@ function AdminLayout() {
 		<>
 			<ScrollToTop />
 			<Routes>
-				<Route path="/1" element={<AdminPanel />} />
+				<Route index element={<AdminPanel />} />
 				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</>

@@ -117,6 +117,7 @@ const AdminTabsList = () => {
 					<Table>
 						<TableHeader>
 							<TableRow>
+								<TableHead>№</TableHead>
 								<TableHead>Заголовок</TableHead>
 								<TableHead>Автор</TableHead>
 								<TableHead>Дата</TableHead>
@@ -128,7 +129,8 @@ const AdminTabsList = () => {
 						<TableBody>
 							{events.map((event) => (
 								<TableRow key={event.id}>
-									<TableCell className="font-medium">{event.title}</TableCell>
+									<TableCell className="font-medium">{event.id}</TableCell>
+									<TableCell>{event.title}</TableCell>
 									<TableCell>{event.user_name}</TableCell>
 									<TableCell>
 										{new Date(event.created_at).toLocaleDateString()}

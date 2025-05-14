@@ -247,7 +247,13 @@ const Profile = () => {
 													<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 mb-2">
 														<h3 className="font-medium">{exp.position}</h3>
 														<span className="text-sm text-alumni-gray">
-															{exp.start_experience} - {exp.end_experience}
+															{exp.start_experience
+																? new Date(exp.start_experience).getFullYear()
+																: '??'}{' '}
+															-{' '}
+															{exp.end_experience
+																? new Date(exp.end_experience).getFullYear()
+																: '??'}
 														</span>
 													</div>
 

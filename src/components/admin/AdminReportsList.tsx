@@ -92,7 +92,7 @@ const AdminReportList = () => {
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>Тип</TableHead>
+								<TableHead>№</TableHead>
 								<TableHead>Скаржник</TableHead>
 								<TableHead>Причина</TableHead>
 								<TableHead>Дата</TableHead>
@@ -103,13 +103,7 @@ const AdminReportList = () => {
 						<TableBody>
 							{reports.map((report) => (
 								<TableRow key={report.id}>
-									<TableCell className="font-medium capitalize">
-										{report.type === 'post'
-											? 'Публікація'
-											: report.type === 'comment'
-											? 'Коментар'
-											: 'Користувач'}
-									</TableCell>
+									<TableCell className="font-medium">{report.id}</TableCell>
 									<TableCell>{report.author.name}</TableCell>
 									<TableCell className="max-w-100">{report.title}</TableCell>
 									<TableCell>

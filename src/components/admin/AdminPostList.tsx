@@ -107,6 +107,7 @@ const AdminPostList = () => {
 					<Table>
 						<TableHeader>
 							<TableRow>
+								<TableHead>№</TableHead>
 								<TableHead>Заголовок</TableHead>
 								<TableHead>Автор</TableHead>
 								<TableHead>Дата</TableHead>
@@ -118,7 +119,8 @@ const AdminPostList = () => {
 						<TableBody>
 							{posts.map((post) => (
 								<TableRow key={post.id}>
-									<TableCell className="font-medium">{post.title}</TableCell>
+									<TableCell className="font-medium">{post.id}</TableCell>
+									<TableCell>{post.title}</TableCell>
 									<TableCell>{post.user_name}</TableCell>
 									<TableCell>
 										{new Date(post.created_at).toLocaleDateString()}

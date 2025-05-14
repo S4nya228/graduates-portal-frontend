@@ -3,6 +3,8 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { X, UserPlus } from 'lucide-react'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
+import { toast } from 'react-toastify'
+import userService from '../../services/userService'
 
 const CreateUserModal = () => {
 	const [formData, setFormData] = useState({
@@ -14,19 +16,39 @@ const CreateUserModal = () => {
 		password_confirmation: '',
 	})
 
+	const [open, setOpen] = useState(false)
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
 		setFormData({ ...formData, [name]: value })
 	}
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		// TODO: Replace with actual POST request
-		console.log('User submitting:', formData)
+
+		try {
+			const payload = {
+				...formData,
+			}
+			await userService.create(payload)
+			setOpen(false)
+			toast.success('Користувача створено успішно!')
+			setFormData({
+				name: '',
+				email: '',
+				graduation_at: '',
+				specialty: '',
+				password: '',
+				password_confirmation: '',
+			})
+		} catch (error) {
+			toast.error('Помилка при створенні користувача')
+			console.error('Помилка створення користувача:', error)
+		}
 	}
 
 	return (
-		<Dialog.Root>
+		<Dialog.Root open={open} onOpenChange={setOpen}>
 			<Dialog.Trigger asChild>
 				<Button className="bg-alumni-purple hover:bg-[#8B5CF6]/90">
 					<UserPlus className="mr-2 h-4 w-4" />

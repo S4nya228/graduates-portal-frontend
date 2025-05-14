@@ -97,6 +97,7 @@ const AdminUserList = () => {
 					<Table>
 						<TableHeader>
 							<TableRow>
+								<TableHead>№</TableHead>
 								<TableHead>Ім'я</TableHead>
 								<TableHead>Email</TableHead>
 								<TableHead>Рік випуску</TableHead>
@@ -107,7 +108,8 @@ const AdminUserList = () => {
 						<TableBody>
 							{users.map((user) => (
 								<TableRow key={user.id}>
-									<TableCell className="font-medium">{user.name}</TableCell>
+									<TableCell className="font-medium">{user.id}</TableCell>
+									<TableCell>{user.name}</TableCell>
 									<TableCell>{user.email}</TableCell>
 									<TableCell>{user.graduation_at}</TableCell>
 									<TableCell>{renderStatusBadge(user.status)}</TableCell>
