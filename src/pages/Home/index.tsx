@@ -3,7 +3,6 @@ import Button from '../../components/ui/Button'
 import { Bell, Calendar, ThumbsUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CreatePostModal from '../../components/CreatePublicationModal'
-import axiosInstance from '../../api/axiosInstance'
 import NewsCard from '../../components/NewsCard'
 import eventService, { Event } from '../../services/eventService'
 import SupportModal from '../../components/SupportModal'
@@ -51,6 +50,12 @@ const Index: React.FC = () => {
 	useEffect(() => {
 		fetchPosts()
 		fetchEvents()
+	}, [])
+
+	useEffect(() => {
+		const handler = () => fetchPosts()
+		window.addEventListener('postDeleted', handler)
+		return () => window.removeEventListener('postDeleted', handler)
 	}, [])
 
 	if (loading) {
@@ -123,12 +128,6 @@ const Index: React.FC = () => {
 								<NewsCard post={post} />
 							</Link>
 						))}
-
-						<div className="text-center mt-8">
-							<Button variant="outline" className="hover:bg-[#8B5CF6]">
-								Завантажити більше
-							</Button>
-						</div>
 					</div>
 					<div>
 						<div className="sticky top-20 bg-white rounded-lg shadow-md p-6 mb-6">

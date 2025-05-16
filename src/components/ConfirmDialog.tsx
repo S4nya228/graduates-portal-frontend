@@ -24,13 +24,14 @@ const ConfirmDialog = ({
 	description = 'Ви впевнені, що хочете продовжити?',
 	onConfirm,
 	onCancel,
+
 	confirmText = 'Так',
 	cancelText = 'Скасувати',
 	loading = false,
 }: ConfirmDialogProps) => {
 	return (
 		<Dialog open={open} onOpenChange={onCancel}>
-			<DialogContent>
+			<DialogContent onClick={(e) => e.stopPropagation()}>
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 				</DialogHeader>

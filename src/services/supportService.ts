@@ -28,6 +28,6 @@ export const updateSupportRequest = async (
 		status: 'A' | 'B' | 'C' | 'D' | 'F'
 	}
 ): Promise<SupportRequest> => {
-	const response = await axiosInstance.put(`/support/${id}`, data)
+	const response = await axiosInstance.put(`/support/reply/${id}`, data)
 	return response.data
 }

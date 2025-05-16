@@ -2,8 +2,18 @@ import React, { useState } from 'react'
 import { Card, CardContent, CardFooter, CardHeader } from './Card'
 import Button from './ui/Button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/Avatar'
-import { Heart, MessageSquare } from 'lucide-react'
+import {
+	Heart,
+	MessageSquare,
+	MoreHorizontal,
+	Pencil,
+	Trash2,
+} from 'lucide-react'
 import postService from '../services/postService'
+import { useAppSelector } from '../hooks/redux'
+import { toast } from 'react-toastify'
+import ConfirmDialog from './ConfirmDialog'
+import { createPortal } from 'react-dom'
 
 export interface NewsCardProps {
 	post: {
@@ -28,6 +38,11 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 	)
 	const [likeCount, setLikeCount] = useState(post.like_count)
 	const [loading, setLoading] = useState(false)
+	const user = useAppSelector((state) => state.auth.user)
+	const isMyPost = user?.id === post.user_id
+	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const [deleteId, setDeleteId] = useState<number | null>(null)
+	const [isDeleting, setIsDeleting] = useState(false)
 
 	const handleToggleLike = async () => {
 		if (loading) return
@@ -45,10 +60,25 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 		}
 	}
 
+	const handleDeleteConfirm = async () => {
+		if (!deleteId) return
+		setIsDeleting(true)
+		try {
+			await postService.remove(deleteId)
+			window.dispatchEvent(new Event('postDeleted'))
+			toast.success('Публікацію успішно видалено')
+			setDeleteId(null)
+		} catch (e) {
+			toast.error('Помилка при видаленні публікації')
+		} finally {
+			setIsDeleting(false)
+		}
+	}
+
 	return (
 		<Card className="alumni-card overflow-hidden mb-6 animate-fade-in">
 			<CardHeader className="pb-3">
-				<div className="flex items-center space-x-3">
+				<div className="flex items-center space-x-3 w-full">
 					<Avatar>
 						{post.user_avatar && (
 							<AvatarImage src={post.user_avatar} alt={post.user_name} />
@@ -61,6 +91,46 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 							<span>{new Date(post.created_at).toLocaleDateString()}</span>
 						</div>
 					</div>
+					{isMyPost && (
+						<div className="ml-auto relative">
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={(e) => {
+									e.preventDefault()
+									setIsMenuOpen((prev) => !prev)
+								}}
+							>
+								<MoreHorizontal className="w-5 h-5 text-black-500" />
+							</Button>
+							{isMenuOpen && (
+								<div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md w-32 z-10">
+									<Button
+										variant="ghost"
+										className="w-full text-left p-2"
+										onClick={(e) => {
+											e.preventDefault
+										}}
+									>
+										<Pencil className="w-4 h-4 text-blue-500" />
+										Редагувати
+									</Button>
+									<Button
+										variant="ghost"
+										className="w-full text-left p-2"
+										onClick={(e) => {
+											e.stopPropagation()
+											e.preventDefault()
+											setDeleteId(post.id)
+										}}
+									>
+										<Trash2 className="w-4 h-4 text-red-500" />
+										Видалити
+									</Button>
+								</div>
+							)}
+						</div>
+					)}
 				</div>
 			</CardHeader>
 
@@ -108,6 +178,15 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 					</Button>
 				</div>
 			</CardFooter>
+			<ConfirmDialog
+				open={deleteId !== null}
+				title="Видалення публікації"
+				description="Ви дійсно хочете видалити цю публікацію? Цю дію неможливо скасувати."
+				onConfirm={handleDeleteConfirm}
+				onCancel={() => setDeleteId(null)}
+				loading={isDeleting}
+				confirmText="Видалити"
+			/>
 		</Card>
 	)
 }

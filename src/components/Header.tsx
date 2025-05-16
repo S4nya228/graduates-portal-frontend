@@ -11,19 +11,17 @@ import {
 	LogIn,
 	Calendar,
 } from 'lucide-react'
-import authService from '../services/userService'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../store'
 import { authActions } from '../store/authSlice'
-import { User as UserType } from '../types'
+import userService from '../services/userService'
 
 const Header = () => {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-	const [user, setUser] = useState<UserType | null>(null)
 	const [isLoggedIn, setIsLoggedIn] = useState(false)
 	const location = useLocation()
-
 	const token = useSelector((state: RootState) => state.auth.token)
+	const user = useSelector((state: RootState) => state.auth.user)
 	const dispatch = useDispatch()
 
 	const fetchUserData = async () => {
@@ -33,10 +31,11 @@ const Header = () => {
 		}
 
 		try {
-			const userData = await authService.current()
+			dispatch(authActions.setLoading(true))
+			const userData = await userService.current()
 
 			if (userData) {
-				setUser(userData)
+				dispatch(authActions.setUser(userData))
 				setIsLoggedIn(true)
 			} else {
 				setIsLoggedIn(false)
@@ -44,12 +43,14 @@ const Header = () => {
 		} catch (error) {
 			console.log('Помилка при отриманні даних користувача:', error)
 			setIsLoggedIn(false)
+			dispatch(authActions.setError('Помилка при отриманні даних користувача.'))
+		} finally {
+			dispatch(authActions.setLoading(false))
 		}
 	}
 
 	const handleLogout = () => {
 		dispatch(authActions.logout())
-		setUser(null)
 		setIsLoggedIn(false)
 	}
 

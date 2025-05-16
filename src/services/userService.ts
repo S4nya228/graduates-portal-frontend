@@ -7,6 +7,10 @@ interface Service {
 	updateCabinet: (data: Partial<User> | FormData) => Promise<User | undefined>
 	getAll: () => Promise<User[]>
 	create: (data: Partial<User> | FormData) => Promise<User | undefined>
+	update: (
+		id: number,
+		data: Partial<User> | FormData
+	) => Promise<User | undefined>
 }
 
 export default <Service>{
@@ -65,6 +69,18 @@ export default <Service>{
 			return response.data
 		} catch (e: any) {
 			console.log(e?.response?.data)
+		}
+	},
+	async update(id: number, payload: any): Promise<User | undefined> {
+		try {
+			const response = await axiosInstance.put<User>(
+				`/admin/user/${id}`,
+				payload
+			)
+			return response.data
+		} catch (e: any) {
+			console.log(e?.response?.data)
+			return undefined
 		}
 	},
 }

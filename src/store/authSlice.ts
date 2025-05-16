@@ -5,6 +5,7 @@ interface State {
 	token: string | null
 	user: User | null
 	isLoading: boolean
+	error: string | null
 }
 
 const authSlice = createSlice({
@@ -12,7 +13,8 @@ const authSlice = createSlice({
 	initialState: <State>{
 		token: localStorage.getItem('token'),
 		user: null,
-		isLoading: true,
+		isLoading: false,
+		error: null,
 	},
 	reducers: {
 		setToken(state, action: PayloadAction<{ token: string }>) {
@@ -21,14 +23,19 @@ const authSlice = createSlice({
 		},
 		setUser(state, action: PayloadAction<User>) {
 			state.user = action.payload
+			state.isLoading = false
 		},
 		logout(state) {
 			state.token = null
 			state.user = null
+			state.isLoading = false
 			localStorage.removeItem('token')
 		},
 		setLoading(state, action: PayloadAction<boolean>) {
 			state.isLoading = action.payload
+		},
+		setError(state, action: PayloadAction<string | null>) {
+			state.error = action.payload
 		},
 	},
 })

@@ -14,18 +14,26 @@ import {
 	CardHeader,
 	CardTitle,
 } from '../Card'
-import { CheckCircle, Edit, Search, Trash2, UserPlus } from 'lucide-react'
+import { Edit, Search } from 'lucide-react'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
 import CreateUserModal from './CreateUserModal'
 import userService from '../../services/userService'
 import { User } from '../../types'
+import EditUserModal from './EditUserModal'
 
 const AdminUserList = () => {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [users, setUsers] = useState<User[]>([])
 	const [loading, setLoading] = useState<boolean>(true)
+	const [selectedUser, setSelectedUser] = useState<User | null>(null)
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+
+	const openEditModal = (user: User) => {
+		setSelectedUser(user)
+		setIsEditModalOpen(true)
+	}
 
 	const fetchUsers = async () => {
 		try {
@@ -50,27 +58,6 @@ const AdminUserList = () => {
 		)
 	}
 
-	const renderStatusBadge = (status: string) => {
-		switch (status) {
-			case 'active':
-				return <Badge className="bg-green-500">Активний</Badge>
-			case 'pending':
-				return <Badge className="bg-yellow-500">Очікує підтвердження</Badge>
-			case 'inactive':
-				return <Badge className="bg-gray-500">Неактивний</Badge>
-			case 'published':
-				return <Badge className="bg-green-500">Опубліковано</Badge>
-			case 'draft':
-				return <Badge className="bg-gray-500">Чернетка</Badge>
-			case 'flagged':
-				return <Badge className="bg-red-500">Позначено</Badge>
-			case 'resolved':
-				return <Badge className="bg-green-500">Вирішено</Badge>
-			default:
-				return <Badge>{status}</Badge>
-		}
-	}
-
 	return (
 		<Card>
 			<CardHeader>
@@ -90,7 +77,7 @@ const AdminUserList = () => {
 							onChange={(e) => setSearchQuery(e.target.value)}
 						/>
 					</div>
-					<CreateUserModal />
+					<CreateUserModal onUserCreated={fetchUsers} />
 				</div>
 
 				<div className="rounded-md">
@@ -100,8 +87,8 @@ const AdminUserList = () => {
 								<TableHead>№</TableHead>
 								<TableHead>Ім'я</TableHead>
 								<TableHead>Email</TableHead>
-								<TableHead>Рік випуску</TableHead>
-								<TableHead>Статус</TableHead>
+								<TableHead>Дата реєстрації</TableHead>
+								<TableHead>Роль</TableHead>
 								<TableHead>Дії</TableHead>
 							</TableRow>
 						</TableHeader>
@@ -111,22 +98,25 @@ const AdminUserList = () => {
 									<TableCell className="font-medium">{user.id}</TableCell>
 									<TableCell>{user.name}</TableCell>
 									<TableCell>{user.email}</TableCell>
-									<TableCell>{user.graduation_at}</TableCell>
-									<TableCell>{renderStatusBadge(user.status)}</TableCell>
+									<TableCell>
+										{new Date(user.created_at).toLocaleDateString()}
+									</TableCell>
+									<TableCell>
+										{user.is_admin ? (
+											<Badge className="bg-red-500">Адміністратор</Badge>
+										) : (
+											<Badge className="bg-blue-500">Користувач</Badge>
+										)}
+									</TableCell>
 									<TableCell>
 										<div className="flex space-x-2">
-											<Button variant="ghost" size="sm">
+											<Button
+												variant="ghost"
+												size="sm"
+												onClick={() => openEditModal(user)}
+											>
 												<Edit className="h-4 w-4" />
 											</Button>
-											{user.status === 'pending' && (
-												<Button
-													variant="ghost"
-													size="sm"
-													className="text-green-500"
-												>
-													<CheckCircle className="h-4 w-4" />
-												</Button>
-											)}
 										</div>
 									</TableCell>
 								</TableRow>
@@ -135,6 +125,12 @@ const AdminUserList = () => {
 					</Table>
 				</div>
 			</CardContent>
+			<EditUserModal
+				user={selectedUser}
+				open={isEditModalOpen}
+				onClose={() => setIsEditModalOpen(false)}
+				onUpdated={fetchUsers}
+			/>
 		</Card>
 	)
 }

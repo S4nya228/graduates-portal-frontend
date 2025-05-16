@@ -65,13 +65,18 @@ const CommentList: React.FC<CommentListProps> = ({ comments, postId }) => {
 								<Button
 									variant="ghost"
 									size="sm"
-									className={clsx('gap-1 h-8 px-2', {
-										'text-red-500': comment.has_reaction,
-									})}
+									className="gap-1 h-8 px-2"
 									onClick={() => handleLike(comment.id)}
 								>
-									<Heart className="w-4 h-4 fill-current" />
-									<span>{comment.like_count ?? 0}</span>
+									<Heart
+										className={clsx('w-4 h-4', {
+											'fill-red-500 stroke-red-500 text-red-500':
+												comment.has_reaction,
+										})}
+									/>
+									<span className="text-muted-foreground">
+										{comment.like_count ?? 0}
+									</span>
 								</Button>
 							</div>
 						</div>
