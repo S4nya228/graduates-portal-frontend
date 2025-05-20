@@ -41,8 +41,14 @@ const Publication = () => {
 
 	useEffect(() => {
 		const handler = () => fetchPost()
+
 		window.addEventListener('commentAdded', handler)
-		return () => window.removeEventListener('commentAdded', handler)
+		window.addEventListener('commentDeleted', handler)
+
+		return () => {
+			window.removeEventListener('commentAdded', handler)
+			window.removeEventListener('commentUpdated', handler)
+		}
 	}, [])
 
 	const handleToggleLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -148,14 +154,10 @@ const Publication = () => {
 										/>
 										<span>{likeCount}</span>
 									</Button>
-									<Button
-										variant="ghost"
-										size="sm"
-										className="flex items-center gap-1"
-									>
+									<div className="flex items-center gap-1">
 										<MessageSquare className="w-5 h-5" />
 										<span>{publication.comment_count}</span>
-									</Button>
+									</div>
 								</div>
 							</CardFooter>
 						</Card>
@@ -191,10 +193,11 @@ const Publication = () => {
 									</div>
 								</div>
 								<p className="text-muted-foreground">
-									Інформація про автора публікації.
+									{publication.user_about ||
+										'Ця людина ще не додала опис до свого профілю.'}
 								</p>
 								<div className="mt-4">
-									<Link to={`/profile/${publication.user_id}`}>
+									<Link to={`/cabinet/${publication.user_id}`}>
 										<Button variant="outline" className="w-full">
 											Переглянути профіль
 										</Button>

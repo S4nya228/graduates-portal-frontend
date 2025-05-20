@@ -38,6 +38,7 @@ export interface User {
 	created_at: string
 	updated_at: string
 	is_admin: boolean
+	graduated_at: string | null
 }
 
 export interface SupportRequest {

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import Button from '../../components/ui/Button'
-import { Bell, Calendar, ThumbsUp } from 'lucide-react'
+import { AlertCircle, Bell, Calendar, ThumbsUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CreatePostModal from '../../components/CreatePublicationModal'
 import NewsCard from '../../components/NewsCard'
 import eventService, { Event } from '../../services/eventService'
 import SupportModal from '../../components/SupportModal'
 import postService from '../../services/postService'
+import { useAuth } from '../../hooks/useAuth'
 
 const Index: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -15,6 +16,7 @@ const Index: React.FC = () => {
 	const [loading, setLoading] = useState<boolean>(true)
 	const [eventsLoading, setEventsLoading] = useState<boolean>(true)
 	const [error, setError] = useState<string | null>(null)
+	const { isAuthenticated } = useAuth()
 
 	const openModal = () => setIsModalOpen(true)
 	const closeModal = () => setIsModalOpen(false)
@@ -114,21 +116,37 @@ const Index: React.FC = () => {
 					<div className="lg:col-span-2">
 						<div className="flex items-center justify-between mb-6">
 							<h2 className="text-2xl font-bold">Стрічка новин</h2>
-							<Button
-								onClick={openModal}
-								variant="outline"
-								className="hover:bg-[#8B5CF6]"
-							>
-								Створити публікацію
-							</Button>
+
+							{isAuthenticated && (
+								<Button
+									onClick={openModal}
+									variant="outline"
+									className="hover:bg-[#8B5CF6]"
+								>
+									Створити публікацію
+								</Button>
+							)}
 						</div>
 
-						{posts.map((post) => (
-							<Link to={`/publication/${post.id}`} key={post.id}>
-								<NewsCard post={post} />
-							</Link>
-						))}
+						{posts.length === 0 ? (
+							<div className="flex flex-col items-center justify-center py-20 text-center text-gray-500 space-y-4">
+								<AlertCircle className="w-12 h-12 mx-auto text-gray-400" />
+								<p className="text-lg font-semibold">Публікацій поки немає</p>
+								<p className="max-w-sm">
+									{isAuthenticated
+										? 'Схоже, тут ще немає новин. Натисніть "Створити публікацію", щоб додати першу.'
+										: 'Схоже, тут ще немає новин. Увійдіть у систему, щоб створювати публікації.'}
+								</p>
+							</div>
+						) : (
+							posts.map((post) => (
+								<Link to={`/publication/${post.id}`} key={post.id}>
+									<NewsCard post={post} fetchPosts={fetchPosts} />
+								</Link>
+							))
+						)}
 					</div>
+
 					<div>
 						<div className="sticky top-20 bg-white rounded-lg shadow-md p-6 mb-6">
 							<div className="flex items-center justify-between mb-4">
@@ -147,7 +165,14 @@ const Index: React.FC = () => {
 								{eventsLoading ? (
 									<p className="text-sm text-gray-500">Завантаження подій...</p>
 								) : events.length === 0 ? (
-									<p className="text-sm text-gray-500">Немає подій</p>
+									<div className="flex flex-col items-center justify-center py-12 text-center text-gray-500 space-y-3">
+										<Calendar className="w-10 h-10 text-alumni-blue" />
+										<p className="text-lg font-semibold">Подій поки немає</p>
+										<p className="max-w-xs text-sm">
+											Здається, найближчим часом не планується жодних заходів.
+											Стежте за оновленнями — можливо, скоро щось з’явиться!
+										</p>
+									</div>
 								) : (
 									events.map((event) => (
 										<div
@@ -173,23 +198,24 @@ const Index: React.FC = () => {
 								)}
 							</div>
 						</div>
+						{isAuthenticated && (
+							<div className="sticky top-115 bg-white rounded-lg shadow-md p-6">
+								<h3 className="text-lg font-semibold mb-4">Швидкі дії</h3>
 
-						<div className="sticky top-115 bg-white rounded-lg shadow-md p-6">
-							<h3 className="text-lg font-semibold mb-4">Швидкі дії</h3>
-
-							<div className="grid grid-cols-2 gap-3">
-								<Link to="/notification" className="w-full">
-									<Button
-										variant="outline"
-										className="w-full justify-start hover:bg-[#8B5CF6]"
-									>
-										<Bell className="mr-2 h-4 w-4" />
-										Сповіщення
-									</Button>
-								</Link>
-								<SupportModal />
+								<div className="grid grid-cols-2 gap-3">
+									<Link to="/notification" className="w-full">
+										<Button
+											variant="outline"
+											className="w-full justify-start hover:bg-[#8B5CF6]"
+										>
+											<Bell className="mr-2 h-4 w-4" />
+											Сповіщення
+										</Button>
+									</Link>
+									<SupportModal />
+								</div>
 							</div>
-						</div>
+						)}
 					</div>
 				</div>
 			</div>

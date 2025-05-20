@@ -113,7 +113,7 @@ const Events: React.FC = () => {
 						<Filter className="h-5 w-5 text-alumni-purple" />
 						<span className="font-medium">Фільтрувати за місяцем:</span>
 						<Select value={selectedMonth} onValueChange={handleMonthFilter}>
-							<SelectTrigger className="w-[180px]">
+							<SelectTrigger className="w-[180px] h-10 rounded-md border border-[hsl(214.3,31.8%,91.4%)] bg-[hsl(210,40%,98%)] px-3 py-2 text-base file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-[hsl(222.2,84%,4.9%)] placeholder:text-[hsl(215.4,16.3%,46.9%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(252,56%,57%)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm' cursor-pointer">
 								<SelectValue placeholder="Всі місяці" />
 							</SelectTrigger>
 							<SelectContent>
@@ -146,70 +146,88 @@ const Events: React.FC = () => {
 				{loading ? (
 					<p className="text-center text-gray-500">Завантаження подій...</p>
 				) : (
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{filteredEvents.map((event) => (
-							<Card
-								key={event.id}
-								className="hover:shadow-md transition-shadow"
-							>
-								<CardHeader className="bg-alumni-light-gray/50">
-									<CardTitle className="text-alumni-purple">
-										{event.title}
-									</CardTitle>
-									<CardDescription className="flex items-center mt-2">
-										<Calendar className="h-4 w-4 mr-2 text-alumni-blue" />
-										{new Date(event.start_event_date).toLocaleDateString(
-											'uk-UA',
-											{
-												day: 'numeric',
-												month: 'long',
-												year: 'numeric',
-											}
-										)}
-									</CardDescription>
-								</CardHeader>
-								<CardContent className="pt-4">
-									<p className="text-sm text-gray-700 mb-4">
-										{event.description}
+					<>
+						{filteredEvents.length === 0 ? (
+							<div className="flex items-center justify-center h-[70vh] w-full">
+								<div className="text-center text-gray-500">
+									<p className="text-2xl font-semibold mb-2">
+										Подій не виявлено
 									</p>
-									<div className="space-y-2 text-sm">
-										<div className="flex items-center text-gray-600">
-											<Clock className="h-4 w-4 mr-2" />
-											<span>
-												{event.star_event_time.slice(0, 5)} –{' '}
-												{event.end_event_time.slice(0, 5)}
-											</span>
-										</div>
-										<div className="flex items-center text-gray-600">
-											<MapPin className="h-4 w-4 mr-2" />
-											<span>{event.location}</span>
-										</div>
-										<div className="flex items-center text-gray-600">
-											<Users className="h-4 w-4 mr-2" />
-											<span>{event.participants} учасників</span>
-										</div>
-									</div>
-								</CardContent>
-								<CardFooter className="flex justify-between">
-									<Button
-										size="sm"
-										className={`${
-											event.is_registered
-												? 'bg-gray-300 hover:bg-gray-400 text-black'
-												: 'bg-alumni-purple hover:bg-[#8B5CF6]/90 text-white'
-										}`}
-										onClick={() =>
-											handleRegistrationToggle(event.id, event.is_registered)
-										}
+									<p className="text-base">
+										Спробуйте змінити місяць або перевірте пізніше.
+									</p>
+								</div>
+							</div>
+						) : (
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+								{filteredEvents.map((event) => (
+									<Card
+										key={event.id}
+										className="hover:shadow-md transition-shadow h-full flex flex-col"
 									>
-										{event.is_registered
-											? 'Скасувати реєстрацію'
-											: 'Зареєструватися'}
-									</Button>
-								</CardFooter>
-							</Card>
-						))}
-					</div>
+										<CardHeader className="bg-alumni-light-gray/50">
+											<CardTitle className="text-alumni-purple">
+												{event.title}
+											</CardTitle>
+											<CardDescription className="flex items-center mt-2">
+												<Calendar className="h-4 w-4 mr-2 text-alumni-blue" />
+												{new Date(event.start_event_date).toLocaleDateString(
+													'uk-UA',
+													{
+														day: 'numeric',
+														month: 'long',
+														year: 'numeric',
+													}
+												)}
+											</CardDescription>
+										</CardHeader>
+										<CardContent className="pt-4 flex-1">
+											<p className="text-sm text-gray-700 mb-4">
+												{event.description}
+											</p>
+											<div className="space-y-2 text-sm">
+												<div className="flex items-center text-gray-600">
+													<Clock className="h-4 w-4 mr-2" />
+													<span>
+														{event.star_event_time.slice(0, 5)} –{' '}
+														{event.end_event_time.slice(0, 5)}
+													</span>
+												</div>
+												<div className="flex items-center text-gray-600">
+													<MapPin className="h-4 w-4 mr-2" />
+													<span>{event.location}</span>
+												</div>
+												<div className="flex items-center text-gray-600">
+													<Users className="h-4 w-4 mr-2" />
+													<span>{event.participants} учасників</span>
+												</div>
+											</div>
+										</CardContent>
+										<CardFooter className="mt-auto">
+											<Button
+												size="sm"
+												className={`w-full ${
+													event.is_registered
+														? 'bg-gray-300 hover:bg-gray-400 text-black'
+														: 'bg-alumni-purple hover:bg-[#8B5CF6]/90 text-white'
+												}`}
+												onClick={() =>
+													handleRegistrationToggle(
+														event.id,
+														event.is_registered
+													)
+												}
+											>
+												{event.is_registered
+													? 'Скасувати реєстрацію'
+													: 'Зареєструватися'}
+											</Button>
+										</CardFooter>
+									</Card>
+								))}
+							</div>
+						)}
+					</>
 				)}
 			</div>
 		</div>

@@ -1,116 +1,74 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import SearchFilters, {
+	SearchFiltersResult,
 	SearchFilters as SearchFiltersType,
 } from '../../components/SearchFilter'
 import ProfileCard from '../../components/ProfileCard'
 import Button from '../../components/ui/Button'
+import { searchUsers } from '../../services/searchService'
+import type { SearchParams } from '../../services/searchService'
 
-const mockAlumniData = [
-	{
-		id: '1',
-		name: 'Олексій Ковальчук',
-		avatar: 'https://randomuser.me/api/portraits/men/44.jpg',
-		graduationYear: 2019,
-		specialization: 'Програмна інженерія',
-		currentPosition: 'Senior Frontend Developer',
-		company: 'GlobalTech Solutions',
-		location: 'Київ, Україна',
-		email: 'oleksii.kovalchuk@example.com',
-		skills: ['JavaScript', 'React', 'TypeScript'],
-	},
-	{
-		id: '2',
-		name: 'Марія Петренко',
-		avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
-		graduationYear: 2018,
-		specialization: "Комп'ютерні науки",
-		currentPosition: 'Data Scientist',
-		company: 'DataInsight',
-		location: 'Львів, Україна',
-		email: 'maria.petrenko@example.com',
-		skills: ['Python', 'Data Science', 'Machine Learning'],
-	},
-	{
-		id: '3',
-		name: 'Іван Мельник',
-		avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-		graduationYear: 2020,
-		specialization: 'Кібербезпека',
-		currentPosition: 'Security Engineer',
-		company: 'CyberShield',
-		location: 'Київ, Україна',
-		email: 'ivan.melnyk@example.com',
-		skills: ['Network Security', 'Penetration Testing', 'Cryptography'],
-	},
-	{
-		id: '4',
-		name: 'Софія Коваленко',
-		avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-		graduationYear: 2017,
-		specialization: 'Програмна інженерія',
-		currentPosition: 'Backend Developer',
-		company: 'TechSolutions',
-		location: 'Одеса, Україна',
-		email: 'sofia.kovalenko@example.com',
-		skills: ['Java', 'Spring', 'Microservices'],
-	},
-	{
-		id: '5',
-		name: 'Максим Шевченко',
-		avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
-		graduationYear: 2021,
-		specialization: 'Штучний інтелект',
-		currentPosition: 'ML Engineer',
-		company: 'AI Innovations',
-		location: 'Харків, Україна',
-		email: 'maxim.shevchenko@example.com',
-		skills: ['Python', 'TensorFlow', 'Neural Networks'],
-	},
-	{
-		id: '6',
-		name: 'Наталія Іванова',
-		avatar: 'https://randomuser.me/api/portraits/women/24.jpg',
-		graduationYear: 2016,
-		specialization: "Комп'ютерні науки",
-		currentPosition: 'Project Manager',
-		company: 'Digital Solutions',
-		location: 'Дніпро, Україна',
-		email: 'natalia.ivanova@example.com',
-		skills: ['Agile', 'Scrum', 'Project Management'],
-	},
-	{
-		id: '7',
-		name: 'Андрій Попов',
-		avatar: 'https://randomuser.me/api/portraits/men/62.jpg',
-		graduationYear: 2019,
-		specialization: 'Програмна інженерія',
-		currentPosition: 'DevOps Engineer',
-		company: 'Cloud Systems',
-		location: 'Київ, Україна',
-		email: 'andriy.popov@example.com',
-		skills: ['Docker', 'Kubernetes', 'AWS'],
-	},
-	{
-		id: '8',
-		name: 'Олена Лисенко',
-		avatar: 'https://randomuser.me/api/portraits/women/14.jpg',
-		graduationYear: 2020,
-		specialization: 'Наука про дані',
-		currentPosition: 'BI Analyst',
-		company: 'DataViz',
-		location: 'Львів, Україна',
-		email: 'olena.lysenko@example.com',
-		skills: ['SQL', 'Tableau', 'PowerBI'],
-	},
-]
+interface Skills {
+	id: number
+	name: string
+}
+interface Alumni {
+	id: number
+	name: string
+	email: string
+	city?: string | null
+	country?: string | null
+	avatar?: string
+	graduated_at: string
+	specialty: string
+	skills: Skills[]
+}
 
 const SearchAlumni = () => {
-	const [searchResults, setSearchResults] = useState(mockAlumniData)
+	const [searchResults, setSearchResults] = useState<Alumni[]>([])
+	const [meta, setMeta] = useState<any>(null)
 	const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid')
+	const [filters, setFilters] = useState<SearchParams>({})
+	const [page, setPage] = useState<number>(1)
 
-	const handleSearch = (filters: SearchFiltersType) => {
-		console.log('Search with filters:', filters)
-		setSearchResults(mockAlumniData)
+	const fetchData = async (filters: SearchParams, page: number) => {
+		try {
+			const response = await searchUsers({ ...filters, page })
+			setSearchResults(response.data)
+			setMeta(response.meta)
+		} catch (error) {
+			console.error('Помилка при пошуку:', error)
+		}
+	}
+
+	useEffect(() => {
+		fetchData(filters, page)
+	}, [filters, page])
+
+	const handleSearch = (filtersResult: SearchFiltersResult) => {
+		const apiFilters: SearchParams = {
+			search: filtersResult.query || undefined,
+			graduation_start: filtersResult.graduationYearStart
+				? `${filtersResult.graduationYearStart}-01-01`
+				: undefined,
+			graduation_end: filtersResult.graduationYearEnd
+				? `${filtersResult.graduationYearEnd}-12-31`
+				: undefined,
+			speciality:
+				filtersResult.specialization && filtersResult.specialization !== 'all'
+					? filtersResult.specialization
+					: undefined,
+			city: filtersResult.city || undefined,
+			country: filtersResult.country || undefined,
+		}
+		setFilters(apiFilters)
+		setPage(1)
+	}
+
+	const handlePageChange = (newPage: number) => {
+		if (newPage !== page) {
+			setPage(newPage)
+		}
 	}
 
 	return (
@@ -129,11 +87,9 @@ const SearchAlumni = () => {
 				<SearchFilters onSearch={handleSearch} />
 
 				<div className="flex justify-between items-center mb-6">
-					<div>
-						<p className="text-alumni-gray">
-							Знайдено {searchResults.length} випускників
-						</p>
-					</div>
+					<p className="text-alumni-gray">
+						Знайдено {meta?.total ?? 0} випускників
+					</p>
 
 					<div className="flex items-center space-x-2">
 						<Button
@@ -163,8 +119,17 @@ const SearchAlumni = () => {
 					</div>
 				</div>
 
-				{displayMode === 'grid' ? (
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+				{searchResults.length === 0 ? (
+					<div className="flex items-center justify-center h-[60vh] w-full">
+						<div className="text-center text-gray-500">
+							<p className="text-2xl font-semibold mb-2">Нічого не знайдено</p>
+							<p className="text-base">
+								Спробуйте змінити фільтри або перевірте інші параметри пошуку.
+							</p>
+						</div>
+					</div>
+				) : displayMode === 'grid' ? (
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 						{searchResults.map((alumni) => (
 							<ProfileCard key={alumni.id} {...alumni} />
 						))}
@@ -174,6 +139,22 @@ const SearchAlumni = () => {
 						{searchResults.map((alumni) => (
 							<ProfileCard key={alumni.id} {...alumni} compact />
 						))}
+					</div>
+				)}
+				{searchResults.length > 0 && meta && (
+					<div className="mt-8 flex justify-center space-x-2">
+						{Array.from({ length: meta.last_page }, (_, i) => i + 1).map(
+							(p) => (
+								<Button
+									key={p}
+									size="sm"
+									variant={p === meta.current_page ? 'default' : 'outline'}
+									onClick={() => handlePageChange(p)}
+								>
+									{p}
+								</Button>
+							)
+						)}
 					</div>
 				)}
 			</div>

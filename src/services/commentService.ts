@@ -42,6 +42,31 @@ const commentService = {
 			throw e
 		}
 	},
+	async deleteComment(postId: number, commentId: number): Promise<void> {
+		try {
+			await axiosInstance.delete(`/post/${postId}/comment/${commentId}`)
+		} catch (e: any) {
+			console.error('Помилка при видаленні коментаря:', e.response?.data)
+			throw e
+		}
+	},
+
+	async updateComment(
+		postId: number,
+		commentId: number,
+		data: CommentPayload
+	): Promise<Comment> {
+		try {
+			const response = await axiosInstance.put<Comment>(
+				`/post/${postId}/comment/${commentId}`,
+				data
+			)
+			return response.data
+		} catch (e: any) {
+			console.error('Помилка при оновленні коментаря:', e.response?.data)
+			throw e
+		}
+	},
 }
 
 export default commentService

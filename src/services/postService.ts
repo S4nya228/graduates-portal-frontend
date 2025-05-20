@@ -1,6 +1,6 @@
 import axiosInstance from '../api/axiosInstance'
 
-interface Post {
+export interface Post {
 	id: number
 	title: string
 	content: string
@@ -19,6 +19,7 @@ interface PostService {
 	getById: (id: string) => Promise<Post[]>
 	getAll: () => Promise<Post[]>
 	remove: (id: number) => Promise<void>
+	update: (id: number, data: FormData) => Promise<void>
 }
 
 const postService: PostService = {
@@ -39,6 +40,7 @@ const postService: PostService = {
 			throw e
 		}
 	},
+
 	async getAll() {
 		try {
 			const response = await axiosInstance.get('/post')
@@ -48,11 +50,27 @@ const postService: PostService = {
 			throw e
 		}
 	},
+
 	async remove(id) {
 		try {
 			await axiosInstance.delete(`/post/${id}`)
 		} catch (e: any) {
 			console.error('Помилка при видаленні поста:', e?.response?.data)
+			throw e
+		}
+	},
+
+	// services/postService.ts
+
+	async update(id: number, data: FormData) {
+		try {
+			await axiosInstance.post(`/post/${id}`, data, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			})
+		} catch (e: any) {
+			console.error('Помилка при оновленні поста:', e?.response?.data)
 			throw e
 		}
 	},

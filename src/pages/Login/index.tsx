@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Label from '../../components/ui/Label'
-import Checkbox from '../../components/ui/Checkbox'
 import {
 	Card,
 	CardContent,
@@ -18,19 +17,39 @@ import { useDispatch } from 'react-redux'
 import { authActions } from '../../store/authSlice'
 import { getNavigate } from '../../navigate'
 import authService from '../../services/authService'
+import { LoginErrors, validateLogin } from '../../validation/validation'
+import { validationMessagesMap } from '../../validation/validationMessages'
 
 const Login = () => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
-	const [error, setError] = useState('')
+	const [errors, setErrors] = useState<LoginErrors>({})
+	const [serverError, setServerError] = useState('')
+
 	const dispatch = useDispatch()
 	const navigate = getNavigate()
 
+	function getFriendlyMessage(message: string): string {
+		return validationMessagesMap[message] || message
+	}
+
+	const validate = () => {
+		const validationErrors = validateLogin(email, password)
+		setErrors(validationErrors)
+		return Object.keys(validationErrors).length === 0
+	}
+
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault()
+		setServerError('')
+		setErrors({})
+
+		if (!validate()) {
+			return
+		}
+
 		setLoading(true)
-		setError('')
 
 		try {
 			const response = await authService.login({ email, password })
@@ -40,14 +59,29 @@ const Login = () => {
 			}
 
 			dispatch(authActions.setToken({ token: response.token }))
-
 			navigate('/profile')
 		} catch (err: any) {
 			console.error(err)
-			setError(
-				err.response?.data?.message ||
-					'Невірні дані для входу або сервер недоступний.'
-			)
+
+			if (err.response?.status === 422 && err.response?.data?.errors) {
+				const apiErrors = err.response.data.errors
+				const formattedErrors: LoginErrors = {}
+
+				Object.entries(apiErrors).forEach(([key, messages]) => {
+					if (Array.isArray(messages)) {
+						formattedErrors[key as keyof LoginErrors] = messages
+							.map(getFriendlyMessage)
+							.join(' ')
+					}
+				})
+
+				setErrors(formattedErrors)
+			} else {
+				setServerError(
+					err.response?.data?.message ||
+						'Невірні дані для входу або сервер недоступний.'
+				)
+			}
 		} finally {
 			setLoading(false)
 		}
@@ -69,11 +103,13 @@ const Login = () => {
 						</CardHeader>
 
 						<CardContent className="space-y-4">
-							{error && (
-								<p className="text-sm text-red-500 text-center">{error}</p>
+							{serverError && (
+								<p className="text-sm text-red-500 text-center">
+									{serverError}
+								</p>
 							)}
 
-							<div className="space-y-2">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="email">Email адреса</Label>
 								<div className="relative">
 									<Input
@@ -87,18 +123,13 @@ const Login = () => {
 									/>
 									<Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted" />
 								</div>
+								{errors.email && (
+									<p className="text-sm text-red-500">{errors.email}</p>
+								)}
 							</div>
 
-							<div className="space-y-2">
-								<div className="flex items-center justify-between">
-									<Label htmlFor="password">Пароль</Label>
-									<Link
-										to="/forgot-password"
-										className="text-xs text-alumni-blue hover:underline"
-									>
-										Забули пароль?
-									</Link>
-								</div>
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="password">Пароль</Label>
 								<div className="relative">
 									<Input
 										id="password"
@@ -110,16 +141,9 @@ const Login = () => {
 									/>
 									<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted" />
 								</div>
-							</div>
-
-							<div className="flex items-center space-x-2">
-								<Checkbox id="remember" />
-								<label
-									htmlFor="remember"
-									className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								>
-									Запам'ятати мене
-								</label>
+								{errors.password && (
+									<p className="text-sm text-red-500">{errors.password}</p>
+								)}
 							</div>
 
 							<Button

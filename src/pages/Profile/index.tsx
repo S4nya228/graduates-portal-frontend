@@ -24,26 +24,44 @@ import userService from '../../services/userService'
 import EditProfileModal from '../../components/EditProfileModal'
 import NewsCard from '../../components/NewsCard'
 import { Link } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 
 const Profile = () => {
 	const [profileData, setProfileData] = useState<any>(null)
 	const [isEditOpen, setIsEditOpen] = useState(false)
 	const [loading, setLoading] = useState<boolean>(true)
+	const { id } = useParams()
+	const isMyProfile = !id
+
+	const fetchUserData = async () => {
+		try {
+			const profile = await userService.cabinet()
+			setProfileData(profile)
+		} catch (e) {
+			console.error('Помилка при отриманні даних профілю:', e)
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const fetchOtherUserData = async (id: number) => {
+		try {
+			const profile = await userService.getCabinetById(id)
+			setProfileData(profile)
+		} catch (e) {
+			console.error('Помилка при отриманні даних профілю:', e)
+		} finally {
+			setLoading(false)
+		}
+	}
 
 	useEffect(() => {
-		const fetchUserData = async () => {
-			try {
-				const profile = await userService.cabinet()
-				setProfileData(profile)
-			} catch (e) {
-				console.error('Помилка при отриманні даних профілю:', e)
-			} finally {
-				setLoading(false)
-			}
+		if (isMyProfile) {
+			fetchUserData()
+		} else {
+			fetchOtherUserData(Number(id))
 		}
-
-		fetchUserData()
-	}, [])
+	}, [id])
 
 	if (loading) {
 		return (
@@ -83,16 +101,17 @@ const Profile = () => {
 									<div>
 										<h1 className="text-2xl font-bold">{profileData.name}</h1>
 									</div>
-
-									<div className="flex gap-2">
-										<Button
-											className="bg-alumni-purple"
-											onClick={() => setIsEditOpen(true)}
-										>
-											<Edit className="mr-2 h-4 w-4" />
-											Редагувати профіль
-										</Button>
-									</div>
+									{isMyProfile && (
+										<div className="flex gap-2">
+											<Button
+												className="bg-alumni-purple"
+												onClick={() => setIsEditOpen(true)}
+											>
+												<Edit className="mr-2 h-4 w-4" />
+												Редагувати профіль
+											</Button>
+										</div>
+									)}
 								</div>
 
 								<div className="mt-4 flex flex-col gap-2">
@@ -188,7 +207,9 @@ const Profile = () => {
 						<Card>
 							<CardContent className="p-6">
 								<h2 className="text-xl font-semibold mb-3">Про мене</h2>
-								<p className="text-gray-600">{profileData.about}</p>
+								<p className="text-gray-600">
+									{profileData.about || 'Інформація про вас не вказана'}
+								</p>
 								<div className="mt-6">
 									<h3 className="font-medium mb-3">Навички</h3>
 									<div className="flex flex-wrap gap-2">
@@ -207,7 +228,7 @@ const Profile = () => {
 								</div>
 
 								<div className="mt-6">
-									<h3 className="font-medium mb-3">Проекти</h3>
+									<h3 className="font-medium mb-3">Проєкти</h3>
 									{profileData.projects &&
 									Array.isArray(profileData.projects) &&
 									profileData.projects.length > 0 ? (
@@ -218,7 +239,7 @@ const Profile = () => {
 											</div>
 										))
 									) : (
-										<p>Проекти не вказані</p>
+										<p>Проєкти не вказані</p>
 									)}
 								</div>
 							</CardContent>
@@ -334,11 +355,18 @@ const Profile = () => {
 						<Card>
 							<CardContent className="p-6">
 								<h2 className="text-xl font-semibold mb-4">Мої публікації</h2>
-								{profileData.posts.map((post: any) => (
-									<Link to={`/publication/${post.id}`} key={post.id}>
-										<NewsCard post={post} />
-									</Link>
-								))}
+
+								{profileData.posts.length === 0 ? (
+									<p className="text-center text-gray-500">
+										У вас ще немає публікацій.
+									</p>
+								) : (
+									profileData.posts.map((post: any) => (
+										<Link to={`/publication/${post.id}`} key={post.id}>
+											<NewsCard post={post} fetchUserData={fetchUserData} />
+										</Link>
+									))
+								)}
 							</CardContent>
 						</Card>
 					</TabsContent>

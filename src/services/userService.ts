@@ -5,6 +5,7 @@ interface Service {
 	current: () => Promise<User | undefined>
 	cabinet: () => Promise<User | undefined>
 	updateCabinet: (data: Partial<User> | FormData) => Promise<User | undefined>
+	getCabinetById: (id: number) => Promise<User | undefined> // <-- нове
 	getAll: () => Promise<User[]>
 	create: (data: Partial<User> | FormData) => Promise<User | undefined>
 	update: (
@@ -47,6 +48,16 @@ export default <Service>{
 			console.log(e?.response?.data)
 		}
 	},
+
+	async getCabinetById(id: number) {
+		try {
+			const response = await axiosInstance.get<User>(`/user/cabinet/${id}`)
+			return response.data
+		} catch (e: any) {
+			console.log(e?.response?.data)
+		}
+	},
+
 	async getAll(): Promise<User[]> {
 		try {
 			const response = await axiosInstance.get<User[]>('/admin/user')
@@ -56,6 +67,7 @@ export default <Service>{
 			return []
 		}
 	},
+
 	async create(data: Partial<User> | FormData) {
 		try {
 			const isFormData = data instanceof FormData
@@ -71,6 +83,7 @@ export default <Service>{
 			console.log(e?.response?.data)
 		}
 	},
+
 	async update(id: number, payload: any): Promise<User | undefined> {
 		try {
 			const response = await axiosInstance.put<User>(

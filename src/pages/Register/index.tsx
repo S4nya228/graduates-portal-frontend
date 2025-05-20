@@ -21,14 +21,19 @@ import {
 	CardHeader,
 	CardTitle,
 } from '../../components/Card'
-import { User, Mail, Lock, Calendar } from 'lucide-react'
+import { User, Mail, Lock, Calendar, GraduationCap } from 'lucide-react'
 import axios from 'axios'
+import { validationMessagesMap } from '../../validation/validationMessages'
+import { validateRegister } from '../../validation/validateRegister'
 
 const Register = () => {
 	const currentYear = new Date().getFullYear()
 	const years = Array.from({ length: 30 }, (_, i) => currentYear - i)
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
+	function getFriendlyMessage(message: string): string {
+		return validationMessagesMap[message] || message
+	}
 
 	const [formData, setFormData] = useState({
 		name: '',
@@ -55,10 +60,12 @@ const Register = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
-		if (formData.password !== formData.password_confirmation) {
-			setErrors({ ...errors, password_confirmation: 'Паролі не співпадають' })
+		const validationErrors = validateRegister(formData)
+		if (Object.keys(validationErrors).length > 0) {
+			setErrors(validationErrors)
 			return
 		}
+
 		setIsSubmitting(true)
 
 		try {
@@ -70,14 +77,26 @@ const Register = () => {
 						token: response.token,
 					})
 				)
-				console.log('Token dispatched:', response.token) // Лог для перевірки
 
 				navigate('/')
 			}
 		} catch (err) {
 			if (axios.isAxiosError(err)) {
 				if (err.response) {
-					setErrors(err.response.data.errors)
+					const apiErrors = err.response.data.errors || {}
+					const formattedErrors: Record<string, string> = {}
+
+					Object.entries(apiErrors).forEach(([field, messages]) => {
+						if (Array.isArray(messages)) {
+							formattedErrors[field] = messages
+								.map(getFriendlyMessage)
+								.join(' ')
+						} else if (typeof messages === 'string') {
+							formattedErrors[field] = getFriendlyMessage(messages)
+						}
+					})
+
+					setErrors(formattedErrors)
 				}
 			} else {
 				setErrors({ general: 'Щось пішло не так, спробуйте ще раз пізніше' })
@@ -134,9 +153,6 @@ const Register = () => {
 							{errors.email && (
 								<p className="text-xs text-red-500">{errors.email}</p>
 							)}
-							<p className="text-xs text-[hsl(215.4,16.3%,46.9%)]">
-								Використовуйте університетську пошту для швидкої верифікації
-							</p>
 						</div>
 
 						<div className="grid grid-cols-2 gap-4">
@@ -149,9 +165,10 @@ const Register = () => {
 											setFormData({ ...formData, graduation_at: value })
 										}
 									>
-										<SelectTrigger className="pl-10">
+										<SelectTrigger className="w-full cursor-pointer rounded-md border border-[hsl(214.3,31.8%,91.4%)] bg-[hsl(210,40%,98%)] px-4 py-2 text-base md:text-sm placeholder:text-[hsl(215.4,16.3%,46.9%)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(252,56%,57%)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10">
 											<SelectValue placeholder="Рік" />
 										</SelectTrigger>
+
 										<SelectContent>
 											{years.map((year) => (
 												<SelectItem key={year} value={year.toString()}>
@@ -160,7 +177,11 @@ const Register = () => {
 											))}
 										</SelectContent>
 									</Select>
-									<Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[hsl(215.416.3%,46.9%)]" />
+
+									<Calendar
+										className="absolute left-3 mt-1 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[hsl(215.4,16.3%,46.9%)]"
+										aria-hidden="true"
+									/>
 								</div>
 							</div>
 
@@ -174,25 +195,30 @@ const Register = () => {
 											setFormData({ ...formData, specialty: value })
 										}
 									>
-										<SelectTrigger>
+										<SelectTrigger className="w-full cursor-pointer rounded-md border border-[hsl(214.3,31.8%,91.4%)] bg-[hsl(210,40%,98%)] px-4 py-2 text-base md:text-sm placeholder:text-[hsl(215.4,16.3%,46.9%)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(252,56%,57%)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10">
 											<SelectValue placeholder="Спеціалізація" />
 										</SelectTrigger>
+
 										<SelectContent>
-											<SelectItem value="software-engineering">
+											<SelectItem value="Програмна інженерія">
 												Програмна інженерія
 											</SelectItem>
-											<SelectItem value="computer-science">
+											<SelectItem value="Комп'ютерні науки">
 												Комп'ютерні науки
 											</SelectItem>
-											<SelectItem value="ai">Штучний інтелект</SelectItem>
-											<SelectItem value="cybersecurity">
-												Кібербезпека
+											<SelectItem value="Штучний інтелект">
+												Штучний інтелект
 											</SelectItem>
-											<SelectItem value="data-science">
+											<SelectItem value="Кібербезпека">Кібербезпека</SelectItem>
+											<SelectItem value="Наука про дані">
 												Наука про дані
 											</SelectItem>
 										</SelectContent>
 									</Select>
+									<GraduationCap
+										className="absolute left-3 mt-1 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[hsl(215.4,16.3%,46.9%)]"
+										aria-hidden="true"
+									/>
 								</div>
 							</div>
 						</div>
@@ -241,7 +267,7 @@ const Register = () => {
 						</div>
 
 						<Button
-							className="w-full bg-alumni-purple hover:bg-alumni-purple/90 cursor-pointer"
+							className="w-full bg-alumni-purple hover:bg-[#8b5cf6]/90 cursor-pointer"
 							onClick={handleSubmit}
 							disabled={isSubmitting}
 						>

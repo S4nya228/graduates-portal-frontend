@@ -12,7 +12,7 @@ import Publication from '../../pages/Publication'
 import Events from '../../pages/Events'
 import ScrollToTop from '../../components/ScrollToTop'
 import Notifications from '../../pages/Notification'
-import RedirectIfAuthenticated from '../../components/RedirectIfAuthenticated'
+import AuthGate from '../../components/AuthGate'
 
 function MainLayout() {
 	return (
@@ -25,23 +25,31 @@ function MainLayout() {
 					<Route
 						path="/login"
 						element={
-							<RedirectIfAuthenticated>
+							<AuthGate>
 								<Login />
-							</RedirectIfAuthenticated>
+							</AuthGate>
 						}
 					/>
 					<Route
 						path="/register"
 						element={
-							<RedirectIfAuthenticated>
+							<AuthGate>
 								<Register />
-							</RedirectIfAuthenticated>
+							</AuthGate>
 						}
 					/>
-					<Route path="/profile" element={<Profile />} />
+					<Route
+						path="/profile"
+						element={
+							<AuthGate requireAuth>
+								<Profile />
+							</AuthGate>
+						}
+					/>
 					<Route path="/search" element={<SearchAlumni />} />
 					<Route path="/publication/:id" element={<Publication />} />
 					<Route path="/events" element={<Events />} />
+					<Route path="/cabinet/:id" element={<Profile />} />
 					<Route path="/notification" element={<Notifications />} />
 					<Route path="*" element={<NotFound />} />
 				</Routes>
