@@ -3,6 +3,8 @@ import CommentForm from './CommentForm'
 import CommentList from './CommentList'
 import commentService from '../services/commentService'
 import type { Comment } from '../services/commentService'
+import { Card } from './Card'
+import { useAppSelector } from '../hooks/redux'
 
 interface PublicationCommentsProps {
 	publicationId: number
@@ -13,6 +15,8 @@ const PublicationComments: React.FC<PublicationCommentsProps> = ({
 	publicationId,
 	comments,
 }) => {
+	const user = useAppSelector((state) => state.auth.user)
+
 	const handleCreateComment = async (text: string) => {
 		try {
 			await commentService.create(Number(publicationId), {
@@ -25,10 +29,22 @@ const PublicationComments: React.FC<PublicationCommentsProps> = ({
 		}
 	}
 
+	if (!user) {
+		return (
+			<Card className="p-6 text-center text-muted-foreground">
+				<p>Увійдіть у свій акаунт, щоб залишати коментарі.</p>
+			</Card>
+		)
+	}
+
 	return (
 		<div>
 			<CommentForm onSubmit={handleCreateComment} />
-			<CommentList postId={publicationId} comments={comments} />
+			<CommentList
+				postId={publicationId}
+				comments={comments}
+				currentUserId={user.id}
+			/>
 		</div>
 	)
 }

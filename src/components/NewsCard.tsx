@@ -9,11 +9,11 @@ import {
 	Pencil,
 	Trash2,
 } from 'lucide-react'
-import postService from '../services/postService'
+import postService, { Post } from '../services/postService'
 import { useAppSelector } from '../hooks/redux'
 import { toast } from 'react-toastify'
 import ConfirmDialog from './ConfirmDialog'
-import { createPortal } from 'react-dom'
+import EditPostModal from './admin/EditPostModal'
 
 export interface NewsCardProps {
 	post: {
@@ -30,9 +30,15 @@ export interface NewsCardProps {
 		has_reaction: boolean
 		reaction_type: 'LIKE' | 'DISLIKE' | null
 	}
+	fetchPosts?: () => void
+	fetchUserData?: () => Promise<any>
 }
 
-const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
+const NewsCard: React.FC<NewsCardProps> = ({
+	post,
+	fetchPosts,
+	fetchUserData,
+}) => {
 	const [liked, setLiked] = useState<boolean>(
 		post.has_reaction && post.reaction_type === 'LIKE'
 	)
@@ -43,6 +49,13 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const [deleteId, setDeleteId] = useState<number | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
+	const [editPost, setEditPost] = useState<Post | null>(null)
+	const [editOpen, setEditOpen] = useState(false)
+
+	const handleEditClick = (post: Post) => {
+		setEditPost(post)
+		setEditOpen(true)
+	}
 
 	const handleToggleLike = async () => {
 		if (loading) return
@@ -109,7 +122,9 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 										variant="ghost"
 										className="w-full text-left p-2"
 										onClick={(e) => {
-											e.preventDefault
+											e.stopPropagation()
+											e.preventDefault()
+											handleEditClick(post)
 										}}
 									>
 										<Pencil className="w-4 h-4 text-blue-500" />
@@ -136,7 +151,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 
 			<CardContent className="pb-4">
 				<h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-				<p className="text-gray-600">{post.content}</p>
+				<p className="text-gray-600 whitespace-pre-wrap">{post.content}</p>
 				{post.image && (
 					<div className="mt-4 rounded-md overflow-hidden">
 						<img
@@ -167,15 +182,13 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 						/>
 						<span>{likeCount}</span>
 					</Button>
-					<Button
-						variant="ghost"
-						size="sm"
+					<div
 						className="flex items-center gap-1"
 						onClick={(e) => e.preventDefault()}
 					>
 						<MessageSquare className="w-5 h-5" />
 						<span>{post.comment_count}</span>
-					</Button>
+					</div>
 				</div>
 			</CardFooter>
 			<ConfirmDialog
@@ -186,6 +199,18 @@ const NewsCard: React.FC<NewsCardProps> = ({ post }) => {
 				onCancel={() => setDeleteId(null)}
 				loading={isDeleting}
 				confirmText="Видалити"
+			/>
+			<EditPostModal
+				post={editPost}
+				open={editOpen}
+				onClose={() => setEditOpen(false)}
+				onUpdated={() => {
+					if (fetchUserData) {
+						fetchUserData()
+					} else if (fetchPosts) {
+						fetchPosts()
+					}
+				}}
 			/>
 		</Card>
 	)

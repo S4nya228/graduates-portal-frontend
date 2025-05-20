@@ -2,42 +2,19 @@ import React from 'react'
 import { Card, CardContent, CardFooter, CardHeader } from '../components/Card'
 import Button from './ui/Button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/Avatar'
-import {
-	Briefcase,
-	GraduationCap,
-	Mail,
-	MapPin,
-	ExternalLink,
-} from 'lucide-react'
+import { GraduationCap, Mail, MapPin } from 'lucide-react'
 import Badge from './ui/Badge'
-
-export interface ProfileCardProps {
-	id: string
-	name: string
-	avatar?: string
-	graduationYear: number
-	specialization: string
-	currentPosition?: string
-	company?: string
-	location?: string
-	email?: string
-	skills?: string[]
-	profileUrl?: string
-	compact?: boolean
-}
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
 	id,
-	name,
 	avatar,
-	graduationYear,
-	specialization,
-	currentPosition,
-	company,
-	location,
+	name,
+	graduated_at,
+	specialty,
+	city,
+	country,
 	email,
 	skills = [],
-	profileUrl,
 	compact = false,
 }) => {
 	if (compact) {
@@ -54,17 +31,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 							<div className="flex items-center text-alumni-gray min-w-0">
 								<GraduationCap className="min-w-5 min-h-5 mr-1 shrink-0" />
 								<span className="">
-									{graduationYear}, {specialization}
+									{new Date(graduated_at).getFullYear()}, {specialty}
 								</span>
 							</div>
-							{currentPosition && company && (
-								<div className="flex items-center text-alumni-gray mt-1">
-									<Briefcase className="min-w-5 min-h-5 mr-1" />
-									<span>
-										{currentPosition} at {company}
-									</span>
-								</div>
-							)}
 						</div>
 					</div>
 					<Button variant="outline" size="sm" className="shrink-0" asChild>
@@ -90,23 +59,17 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 							<div className="flex items-center text-alumni-gray">
 								<GraduationCap className="mr-2 min-w-5 min-h-5" />
 								<span className="break-words text-left">
-									Випускник {graduationYear} року, {specialization}
+									Випускник {new Date(graduated_at).getFullYear()} року,{' '}
+									{specialty}
 								</span>
 							</div>
 
-							{currentPosition && company && (
-								<div className="flex items-center text-alumni-gray">
-									<Briefcase className="mr-2 min-w-5 min-h-5" />
-									<span className="break-words text-left">
-										{currentPosition} у {company}
-									</span>
-								</div>
-							)}
-
-							{location && (
+							{country && (
 								<div className="flex items-center text-alumni-gray">
 									<MapPin className="mr-2 min-w-5 min-h-5" />
-									<span className="break-words text-left">{location}</span>
+									<span className="break-words text-left">
+										{city}, {country}
+									</span>
 								</div>
 							)}
 
@@ -131,13 +94,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 					<div className="mt-4">
 						<h3 className="text-sm font-medium mb-2">Навички</h3>
 						<div className="flex flex-wrap gap-2">
-							{skills.map((skill, index) => (
+							{skills.map((skill) => (
 								<Badge
-									key={index}
+									key={skill.id}
 									variant="secondary"
 									className="bg-alumni-light-gray text-alumni-dark"
 								>
-									{skill}
+									{skill.name}
 								</Badge>
 							))}
 						</div>
@@ -147,17 +110,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
 			<CardFooter className="flex justify-between pt-2">
 				<Button variant="outline" asChild>
-					<a href={`/profile/${id}`}>Повний профіль</a>
+					<a href={`/cabinet/${id}`}>Повний профіль</a>
 				</Button>
-
-				{profileUrl && (
-					<Button variant="ghost" className="text-alumni-blue" asChild>
-						<a href={profileUrl} target="_blank" rel="noopener noreferrer">
-							<ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-							Зовнішній профіль
-						</a>
-					</Button>
-				)}
 			</CardFooter>
 		</Card>
 	)

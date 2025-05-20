@@ -36,10 +36,10 @@ const Footer = () => {
 							</li>
 							<li>
 								<Link
-									to="/profile"
+									to="/events"
 									className="text-[#F1F5F9] hover:text-white transition-colors"
 								>
-									Особистий кабінет
+									Майбутні події
 								</Link>
 							</li>
 						</ul>

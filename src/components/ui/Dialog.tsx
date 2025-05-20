@@ -34,7 +34,7 @@ export const DialogContent = ({
 		>
 			{children}
 			<RadixDialog.Close className="absolute top-4 right-4 text-muted-foreground hover:text-black">
-				<X className="h-5 w-5" />
+				<X className="h-5 w-5 cursor-pointer" />
 			</RadixDialog.Close>
 		</RadixDialog.Content>
 	</DialogPortal>

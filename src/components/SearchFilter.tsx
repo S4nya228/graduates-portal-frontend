@@ -13,7 +13,7 @@ import Slider from './ui/Slider'
 import { Search, Filter, X } from 'lucide-react'
 
 export interface SearchFiltersProps {
-	onSearch: (filters: SearchFilters) => void
+	onSearch: (filters: SearchFiltersResult) => void
 }
 
 export interface SearchFilters {
@@ -22,7 +22,15 @@ export interface SearchFilters {
 	graduationYearEnd: number
 	specialization: string
 	location: string
-	company: string
+}
+
+export interface SearchFiltersResult {
+	query: string
+	graduationYearStart: number
+	graduationYearEnd: number
+	specialization: string
+	city: string
+	country: string
 }
 
 const currentYear = new Date().getFullYear()
@@ -35,7 +43,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ onSearch }) => {
 		graduationYearEnd: currentYear,
 		specialization: '',
 		location: '',
-		company: '',
 	})
 
 	const [showAdvanced, setShowAdvanced] = useState(false)
@@ -65,7 +72,14 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ onSearch }) => {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
-		onSearch(filters)
+
+		const [city, country] = filters.location.split(',').map((s) => s.trim())
+
+		onSearch({
+			...filters,
+			city: city || '',
+			country: country || '',
+		})
 	}
 
 	const resetFilters = () => {
@@ -75,7 +89,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ onSearch }) => {
 			graduationYearEnd: currentYear,
 			specialization: '',
 			location: '',
-			company: '',
 		})
 	}
 
@@ -87,7 +100,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ onSearch }) => {
 						<Input
 							type="text"
 							name="query"
-							placeholder="Пошук за ім'ям, компанією чи посадою..."
+							placeholder="Пошук за ім'ям"
 							value={filters.query}
 							onChange={handleChange}
 							className="pl-10"
@@ -136,7 +149,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ onSearch }) => {
 							</div>
 						</div>
 
-						<div className="space-y-2">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="specialization">Спеціалізація</Label>
 							<Select
 								value={filters.specialization}
@@ -144,42 +157,33 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ onSearch }) => {
 									handleSelectChange('specialization', value)
 								}
 							>
-								<SelectTrigger>
+								<SelectTrigger className="cursor-pointer  h-10 w-full rounded-md border border-[hsl(214.3,31.8%,91.4%)] bg-[hsl(210,40%,98%)] px-3 py-2 text-base file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-[hsl(222.2,84%,4.9%)] placeholder:text-[hsl(215.4,16.3%,46.9%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(252,56%,57%)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
 									<SelectValue placeholder="Виберіть спеціалізацію" />
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="all">Всі спеціалізації</SelectItem>
-									<SelectItem value="software-engineering">
+									<SelectItem value="Програмна інженерія">
 										Програмна інженерія
 									</SelectItem>
 									<SelectItem value="computer-science">
 										Комп'ютерні науки
 									</SelectItem>
-									<SelectItem value="ai">Штучний інтелект</SelectItem>
-									<SelectItem value="cybersecurity">Кібербезпека</SelectItem>
-									<SelectItem value="data-science">Наука про дані</SelectItem>
+									<SelectItem value="Штучний інтелект">
+										Штучний інтелект
+									</SelectItem>
+									<SelectItem value="Кібербезпека">Кібербезпека</SelectItem>
+									<SelectItem value="Наука про дані">Наука про дані</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="location">Місцезнаходження</Label>
+							<Label htmlFor="location">Місцезнаходження (місто, країна)</Label>
 							<Input
 								id="location"
 								name="location"
-								placeholder="Місто чи країна"
+								placeholder="Приклад: Київ, Україна"
 								value={filters.location}
-								onChange={handleChange}
-							/>
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="company">Компанія</Label>
-							<Input
-								id="company"
-								name="company"
-								placeholder="Назва компанії"
-								value={filters.company}
 								onChange={handleChange}
 							/>
 						</div>

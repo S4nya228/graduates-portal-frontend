@@ -44,7 +44,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 		setImage(null)
 	}
 
-	const handleSubmit = async () => {
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
 		if (title && description) {
 			const newPost: NewPost = { title, description, image }
 
@@ -79,84 +80,91 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 				<Dialog.Title className="text-2xl font-bold mb-4">
 					Створити публікацію
 				</Dialog.Title>
-				<div className="space-y-4">
-					<div className="flex flex-col gap-4">
-						<label htmlFor="title" className="block text-xl font-semibold">
-							Заголовок
-						</label>
-						<Input
-							placeholder="Заголовок..."
-							className="mb-2 text-gray-600"
-							id="title"
-							type="text"
-							value={title}
-							onChange={(e) => setTitle(e.target.value)}
-						/>
-					</div>
-
-					<div className="flex flex-col gap-4">
-						<label
-							htmlFor="description"
-							className="block text-xl font-semibold"
-						>
-							Опис
-						</label>
-						<Textarea
-							placeholder="Вміст..."
-							className="min-h-50 mb-2 text-gray-600"
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-						/>
-					</div>
-
-					<div>
-						<label htmlFor="image" className="block text-xl font-semibold">
-							Зображення (необов'язково)
-						</label>
-						<div className="flex flex-col mt-1 w-full gap-4">
-							{image && (
-								<div className="mt-4 relative">
-									<img
-										src={URL.createObjectURL(image)}
-										alt="Preview"
-										className="w-full h-auto rounded-md"
-									/>
-									<Button
-										variant="outline"
-										className="absolute top-2 right-2 bg-white rounded-full p-3 shadow-md hover:bg-gray-200"
-										onClick={handleRemoveImage}
-									>
-										<X className="text-gray-700" />
-									</Button>
-								</div>
-							)}
-							<Button
-								variant="outline"
-								className="p-2 cursor-pointer"
-								onClick={() => document.getElementById('image-input')?.click()}
-							>
-								Вибрати зображення
-							</Button>
-
-							<input
-								type="file"
-								id="image-input"
-								className="hidden"
-								accept="image/*"
-								onChange={handleImageChange}
+				<form onSubmit={handleSubmit} className="space-y-4">
+					<div className="space-y-4">
+						<div className="flex flex-col gap-4">
+							<label htmlFor="title" className="block text-xl font-semibold">
+								Заголовок
+							</label>
+							<Input
+								placeholder="Заголовок..."
+								className="mb-2 font-bold "
+								required
+								id="title"
+								type="text"
+								value={title}
+								onChange={(e) => setTitle(e.target.value)}
 							/>
 						</div>
-					</div>
-				</div>
 
-				<div className="mt-6 flex justify-end gap-4">
-					<Button variant="outline" onClick={closeModal}>
-						Закрити
-					</Button>
-					<Button variant="outline" onClick={handleSubmit}>
-						Створити
-					</Button>
-				</div>
+						<div className="flex flex-col gap-4">
+							<label
+								htmlFor="description"
+								className="block text-xl font-semibold"
+							>
+								Опис
+							</label>
+							<Textarea
+								placeholder="Вміст..."
+								required
+								className="min-h-50 mb-2 text-gray-600"
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+							/>
+						</div>
+
+						<div>
+							<label htmlFor="image" className="block text-xl font-semibold">
+								Зображення (необов'язково)
+							</label>
+							<div className="flex flex-col mt-1 w-full gap-4">
+								{image && (
+									<div className="mt-4 relative">
+										<img
+											src={URL.createObjectURL(image)}
+											alt="Preview"
+											className="w-full h-auto rounded-md"
+										/>
+										<Button
+											variant="outline"
+											className="absolute top-2 right-2 bg-white rounded-full p-3 shadow-md hover:bg-gray-200"
+											onClick={handleRemoveImage}
+										>
+											<X className="text-gray-700" />
+										</Button>
+									</div>
+								)}
+								<Button
+									variant="outline"
+									type="button"
+									className="p-2 cursor-pointer"
+									onClick={() =>
+										document.getElementById('image-input')?.click()
+									}
+								>
+									Вибрати зображення
+								</Button>
+
+								<input
+									type="file"
+									id="image-input"
+									className="hidden"
+									accept="image/*"
+									onChange={handleImageChange}
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div className="mt-6 flex justify-end gap-4">
+						<Button variant="outline" onClick={closeModal}>
+							Закрити
+						</Button>
+						<Button variant="outline" onClick={handleSubmit}>
+							Створити
+						</Button>
+					</div>
+				</form>
 			</Dialog.Content>
 		</Dialog.Root>
 	)

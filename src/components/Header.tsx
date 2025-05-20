@@ -74,7 +74,6 @@ const Header = () => {
 			name: 'Пошук випускників',
 			path: '/search',
 			icon: <Search className="w-5 h-5 mr-2" />,
-			requiresAuth: true,
 		},
 		{
 			name: 'Події',
