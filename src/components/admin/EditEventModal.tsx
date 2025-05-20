@@ -23,6 +23,7 @@ const EditEventModal = ({ event, onEventUpdated }: EditEventModalProps) => {
 		star_event_time: '',
 		end_event_time: '',
 		location: '',
+		status: '',
 	})
 	const [loading, setLoading] = useState(false)
 	const [open, setOpen] = useState(false)
@@ -37,6 +38,7 @@ const EditEventModal = ({ event, onEventUpdated }: EditEventModalProps) => {
 				star_event_time: event.star_event_time,
 				end_event_time: event.end_event_time,
 				location: event.location,
+				status: event.status || '',
 			})
 			setOpen(true)
 		}
@@ -64,6 +66,7 @@ const EditEventModal = ({ event, onEventUpdated }: EditEventModalProps) => {
 				star_event_time: '',
 				end_event_time: '',
 				location: '',
+				status: '',
 			})
 			setOpen(false)
 			onEventUpdated()
@@ -153,6 +156,23 @@ const EditEventModal = ({ event, onEventUpdated }: EditEventModalProps) => {
 							onChange={handleChange}
 							required
 						/>
+						<div>
+							<label className="block mb-1 text-sm font-medium text-gray-700">
+								Статус
+							</label>
+							<select
+								name="status"
+								value={formData.status}
+								onChange={handleChange}
+								className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+								required
+							>
+								<option value="">Оберіть статус</option>
+								<option value="A">Активний</option>
+								<option value="D">Вимкнений</option>
+								<option value="H">Деактивований</option>
+							</select>
+						</div>
 
 						<div className="flex justify-end pt-4">
 							<Button

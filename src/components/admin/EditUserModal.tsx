@@ -18,10 +18,10 @@ const EditUserModal: React.FC<Props> = ({ user, open, onClose, onUpdated }) => {
 	const [formData, setFormData] = useState({
 		name: '',
 		email: '',
+		graduated_at: '',
+		specialty: '',
 		password: '',
 		password_confirmation: '',
-		graduation_at: '',
-		specialty: '',
 		is_admin: 'N' as 'Y' | 'N',
 	})
 
@@ -32,7 +32,7 @@ const EditUserModal: React.FC<Props> = ({ user, open, onClose, onUpdated }) => {
 				email: user.email || '',
 				password: '',
 				password_confirmation: '',
-				graduation_at: user.graduation_at?.toString() || '',
+				graduated_at: user.graduated_at?.toString() || '',
 				specialty: user.specialty || '',
 				is_admin: user.is_admin ? 'Y' : 'N',
 			})
@@ -53,7 +53,7 @@ const EditUserModal: React.FC<Props> = ({ user, open, onClose, onUpdated }) => {
 		const payload: any = {
 			name: formData.name,
 			email: formData.email,
-			graduation_at: formData.graduation_at,
+			graduated_at: formData.graduated_at,
 			specialty: formData.specialty,
 			is_admin: formData.is_admin,
 		}
@@ -85,7 +85,7 @@ const EditUserModal: React.FC<Props> = ({ user, open, onClose, onUpdated }) => {
 						</Dialog.Title>
 						<Dialog.Close asChild>
 							<button className="text-gray-500 hover:text-black">
-								<X className="w-5 h-5" />
+								<X className="w-5 h-5 cursor-pointer" />
 							</button>
 						</Dialog.Close>
 					</div>
@@ -108,9 +108,9 @@ const EditUserModal: React.FC<Props> = ({ user, open, onClose, onUpdated }) => {
 						/>
 						<Input
 							type="number"
-							name="graduation_at"
+							name="graduated_at"
 							placeholder="Рік випуску"
-							value={formData.graduation_at}
+							value={formData.graduated_at?.slice(0, 4) || ''}
 							onChange={handleChange}
 						/>
 						<Input

@@ -39,6 +39,7 @@ const AdminTabsList = () => {
 	const [deleteId, setDeleteId] = useState<number | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
 	const [editEvent, setEditEvent] = useState<Event | null>(null)
+	const [search, setSearch] = useState('')
 
 	const loadEvents = async () => {
 		try {
@@ -70,6 +71,10 @@ const AdminTabsList = () => {
 		loadEvents()
 	}, [])
 
+	const filteredEvents = events.filter((event) =>
+		event.title.toLowerCase().includes(search.toLowerCase())
+	)
+
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center h-64">
@@ -78,26 +83,22 @@ const AdminTabsList = () => {
 		)
 	}
 
+	const isEmptyList = events.length === 0
+	const isSearchEmpty = events.length > 0 && filteredEvents.length === 0
+
 	const renderStatusBadge = (status: string) => {
 		switch (status) {
-			case 'active':
+			case 'A':
 				return <Badge className="bg-green-500">Активний</Badge>
-			case 'pending':
-				return <Badge className="bg-yellow-500">Очікує підтвердження</Badge>
-			case 'inactive':
-				return <Badge className="bg-gray-500">Неактивний</Badge>
-			case 'published':
-				return <Badge className="bg-green-500">Опубліковано</Badge>
-			case 'draft':
-				return <Badge className="bg-gray-500">Чернетка</Badge>
-			case 'flagged':
-				return <Badge className="bg-red-500">Позначено</Badge>
-			case 'resolved':
-				return <Badge className="bg-green-500">Вирішено</Badge>
+			case 'D':
+				return <Badge className="bg-red-500">Вимкнений</Badge>
+			case 'H':
+				return <Badge className="bg-gray-500">Деактивований</Badge>
 			default:
 				return <Badge>{status}</Badge>
 		}
 	}
+
 	return (
 		<Card>
 			<CardHeader>
@@ -108,42 +109,66 @@ const AdminTabsList = () => {
 				<div className="flex items-center justify-between mb-6">
 					<div className="relative w-full max-w-sm">
 						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[hsl(215.4,16.3%,46.9%)]" />
-						<Input placeholder="Пошук подій..." className="pl-10" />
+						<Input
+							placeholder="Пошук подій..."
+							className="pl-10"
+							value={search}
+							onChange={(e) => setSearch(e.target.value)}
+						/>
 					</div>
 					<CreateEventModal onEventCreated={loadEvents} />
 				</div>
+				{isEmptyList && (
+					<div className="text-center py-20 text-gray-500">
+						Подій поки що немає.
+					</div>
+				)}
 
-				<div className="rounded-md">
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>№</TableHead>
-								<TableHead>Заголовок</TableHead>
-								<TableHead>Автор</TableHead>
-								<TableHead>Дата</TableHead>
-								<TableHead>Статус</TableHead>
-								<TableHead>Взаємодії</TableHead>
-								<TableHead>Дії</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{events.map((event) => (
-								<TableRow key={event.id}>
-									<TableCell className="font-medium">{event.id}</TableCell>
-									<TableCell>{event.title}</TableCell>
-									<TableCell>{event.user_name}</TableCell>
-									<TableCell>
-										{new Date(event.created_at).toLocaleDateString()}
-									</TableCell>
-									<TableCell>{renderStatusBadge(event.status)}</TableCell>
-									<TableCell>
-										<span className="flex items-center text-[hsl(215.4,16.3%,46.9%)]">
-											<Users2Icon className="h-4 w-4 mr-1" />{' '}
-											{event.participants}
-										</span>
-									</TableCell>
-									<TableCell>
-										<div className="flex space-x-2">
+				{isSearchEmpty && (
+					<div className="text-center py-20 text-gray-500">
+						За вашим запитом нічого не знайдено.
+					</div>
+				)}
+				{!isEmptyList && !isSearchEmpty && (
+					<div className="rounded-md">
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead className="text-center">№</TableHead>
+									<TableHead className="text-center">Заголовок</TableHead>
+									<TableHead className="text-center">Автор</TableHead>
+									<TableHead className="text-center">Дата</TableHead>
+									<TableHead className="text-center">Статус</TableHead>
+									<TableHead className="text-center">Учасників</TableHead>
+									<TableHead className="text-center">Дії</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{filteredEvents.map((event) => (
+									<TableRow key={event.id}>
+										<TableCell className="font-medium text-center">
+											{event.id}
+										</TableCell>
+										<TableCell className="text-center">{event.title}</TableCell>
+										<TableCell className="text-center">
+											{event.user_name}
+										</TableCell>
+										<TableCell className="text-center">
+											{new Date(event.created_at).toLocaleDateString()}
+										</TableCell>
+										<TableCell className="text-center">
+											{renderStatusBadge(event.status)}
+										</TableCell>
+										<TableCell>
+											<div className="flex justify-center items-center">
+												<span className="flex items-center text-[hsl(215.4,16.3%,46.9%)]">
+													<Users2Icon className="h-4 w-4 mr-1" />
+													{event.participants}
+												</span>
+											</div>
+										</TableCell>
+
+										<TableCell className="text-center">
 											<Button
 												variant="ghost"
 												size="sm"
@@ -160,13 +185,13 @@ const AdminTabsList = () => {
 											>
 												<Trash2 className="h-4 w-4" />
 											</Button>
-										</div>
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</div>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</div>
+				)}
 			</CardContent>
 			<ConfirmDialog
 				open={deleteId !== null}

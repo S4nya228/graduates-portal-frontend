@@ -45,6 +45,9 @@ const AdminUserList = () => {
 			setLoading(false)
 		}
 	}
+	const filteredUsers = users.filter((user) =>
+		user.name.toLowerCase().includes(searchQuery.toLowerCase())
+	)
 
 	useEffect(() => {
 		fetchUsers()
@@ -57,6 +60,9 @@ const AdminUserList = () => {
 			</div>
 		)
 	}
+
+	const isEmptyList = users.length === 0
+	const isSearchEmpty = users.length > 0 && filteredUsers.length === 0
 
 	return (
 		<Card>
@@ -80,36 +86,50 @@ const AdminUserList = () => {
 					<CreateUserModal onUserCreated={fetchUsers} />
 				</div>
 
-				<div className="rounded-md">
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>№</TableHead>
-								<TableHead>Ім'я</TableHead>
-								<TableHead>Email</TableHead>
-								<TableHead>Дата реєстрації</TableHead>
-								<TableHead>Роль</TableHead>
-								<TableHead>Дії</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{users.map((user) => (
-								<TableRow key={user.id}>
-									<TableCell className="font-medium">{user.id}</TableCell>
-									<TableCell>{user.name}</TableCell>
-									<TableCell>{user.email}</TableCell>
-									<TableCell>
-										{new Date(user.created_at).toLocaleDateString()}
-									</TableCell>
-									<TableCell>
-										{user.is_admin ? (
-											<Badge className="bg-red-500">Адміністратор</Badge>
-										) : (
-											<Badge className="bg-blue-500">Користувач</Badge>
-										)}
-									</TableCell>
-									<TableCell>
-										<div className="flex space-x-2">
+				{isEmptyList && (
+					<div className="text-center py-20 text-gray-500">
+						Користувачів поки що немає.
+					</div>
+				)}
+
+				{isSearchEmpty && (
+					<div className="text-center py-20 text-gray-500">
+						За вашим запитом нічого не знайдено.
+					</div>
+				)}
+
+				{!isEmptyList && !isSearchEmpty && (
+					<div className="rounded-md">
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead className="text-center">№</TableHead>
+									<TableHead className="text-center">Ім'я</TableHead>
+									<TableHead className="text-center">Email</TableHead>
+									<TableHead className="text-center">Дата реєстрації</TableHead>
+									<TableHead className="text-center">Роль</TableHead>
+									<TableHead className="text-center">Дії</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{filteredUsers.map((user) => (
+									<TableRow key={user.id}>
+										<TableCell className="font-medium text-center">
+											{user.id}
+										</TableCell>
+										<TableCell className="text-center">{user.name}</TableCell>
+										<TableCell className="text-center">{user.email}</TableCell>
+										<TableCell className="text-center">
+											{new Date(user.created_at).toLocaleDateString()}
+										</TableCell>
+										<TableCell className="text-center">
+											{user.is_admin ? (
+												<Badge className="bg-red-500">Адміністратор</Badge>
+											) : (
+												<Badge className="bg-blue-500">Користувач</Badge>
+											)}
+										</TableCell>
+										<TableCell className="text-center">
 											<Button
 												variant="ghost"
 												size="sm"
@@ -117,13 +137,13 @@ const AdminUserList = () => {
 											>
 												<Edit className="h-4 w-4" />
 											</Button>
-										</div>
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</div>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</div>
+				)}
 			</CardContent>
 			<EditUserModal
 				user={selectedUser}

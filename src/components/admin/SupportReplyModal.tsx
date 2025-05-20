@@ -4,7 +4,6 @@ import { Textarea } from '../ui/Textarea'
 import Button from '../ui/Button'
 import {
 	fetchSupportRequestById,
-	fetchSupportRequests,
 	updateSupportRequest,
 } from '../../services/supportService'
 import Label from '../ui/Label'
