@@ -71,6 +71,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
 	const handleSubmit = async () => {
 		if (!formData) return
+
 		try {
 			const profileData = new FormData()
 
@@ -88,9 +89,14 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
 			if (Array.isArray(formData.skills) && formData.skills.length > 0) {
 				appendInfoToFormData(profileData, formData.skills, 'skills')
+			} else {
+				profileData.append('info[skills][0]', '')
 			}
+
 			if (Array.isArray(formData.projects) && formData.projects.length > 0) {
 				appendInfoToFormData(profileData, formData.projects, 'projects')
+			} else {
+				profileData.append('info[projects][0]', '')
 			}
 			if (
 				Array.isArray(formData.social_links) &&
@@ -102,6 +108,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 				if (filteredLinks.length > 0) {
 					appendInfoToFormData(profileData, filteredLinks, 'social_links')
 				}
+			} else {
+				profileData.append('info[social_links][0]', '')
 			}
 
 			if (
@@ -119,6 +127,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 				if (filteredExperience.length > 0) {
 					appendInfoToFormData(profileData, filteredExperience, 'experience')
 				}
+			} else {
+				profileData.append('info[experience][0]', '')
 			}
 
 			if (
@@ -154,6 +164,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 						}
 					})
 				})
+			} else {
+				profileData.append('info[graduation][0]', '')
 			}
 
 			if (avatar) {
@@ -385,9 +397,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 										prev
 											? {
 													...prev,
-													experience: prev.experience
-														? prev.experience.filter((_, i) => i !== index)
-														: [],
+													experience:
+														prev.experience?.filter((_, i) => i !== index) ??
+														[],
 											  }
 											: null
 									)
@@ -403,13 +415,105 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 										prev
 											? {
 													...prev,
-													experience: prev.experience
-														? prev.experience.map((item, i) =>
-																i === index
-																	? { ...item, position: e.target.value }
-																	: item
-														  )
-														: [],
+													experience: prev.experience?.map((item, i) =>
+														i === index
+															? { ...item, position: e.target.value }
+															: item
+													),
+											  }
+											: null
+									)
+								}
+							/>
+							<Input
+								placeholder="Компанія"
+								value={exp.company || ''}
+								onChange={(e) =>
+									setFormData((prev) =>
+										prev
+											? {
+													...prev,
+													experience: prev.experience?.map((item, i) =>
+														i === index
+															? { ...item, company: e.target.value }
+															: item
+													),
+											  }
+											: null
+									)
+								}
+							/>
+							<Input
+								placeholder="Локація"
+								value={exp.location || ''}
+								onChange={(e) =>
+									setFormData((prev) =>
+										prev
+											? {
+													...prev,
+													experience: prev.experience?.map((item, i) =>
+														i === index
+															? { ...item, location: e.target.value }
+															: item
+													),
+											  }
+											: null
+									)
+								}
+							/>
+							<div className="flex gap-2">
+								<Input
+									type="date"
+									placeholder="Початок"
+									value={exp.start_experience || ''}
+									onChange={(e) =>
+										setFormData((prev) =>
+											prev
+												? {
+														...prev,
+														experience: prev.experience?.map((item, i) =>
+															i === index
+																? { ...item, start_experience: e.target.value }
+																: item
+														),
+												  }
+												: null
+										)
+									}
+								/>
+								<Input
+									type="date"
+									placeholder="Завершення"
+									value={exp.end_experience || ''}
+									onChange={(e) =>
+										setFormData((prev) =>
+											prev
+												? {
+														...prev,
+														experience: prev.experience?.map((item, i) =>
+															i === index
+																? { ...item, end_experience: e.target.value }
+																: item
+														),
+												  }
+												: null
+										)
+									}
+								/>
+							</div>
+							<Textarea
+								placeholder="Опис досвіду"
+								value={exp.description || ''}
+								onChange={(e) =>
+									setFormData((prev) =>
+										prev
+											? {
+													...prev,
+													experience: prev.experience?.map((item, i) =>
+														i === index
+															? { ...item, description: e.target.value }
+															: item
+													),
 											  }
 											: null
 									)

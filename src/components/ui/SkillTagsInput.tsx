@@ -36,7 +36,7 @@ const SkillTagsInput: React.FC<SkillTagsInputProps> = ({
 	}
 
 	return (
-		<div className="border rounded-md p-2 flex flex-wrap gap-2 bg-gray-50">
+		<div className=" rounded-md p-2 flex flex-wrap gap-2 bg-gray-50">
 			{skills.map((skill, index) => (
 				<div
 					key={index}

@@ -129,7 +129,7 @@ export const SocialLinksForm: FC<SocialLinksFormProps> = ({
 
 			{socialLinks.length < socialOptions.length && (
 				<Button type="button" variant="outline" onClick={handleAdd}>
-					Додати соціальну мережу
+					➕ Додати соціальну мережу
 				</Button>
 			)}
 		</div>
