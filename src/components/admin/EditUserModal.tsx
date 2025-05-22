@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
+import { GraduationCap, X } from 'lucide-react'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import { toast } from 'react-toastify'
 import userService from '../../services/userService'
 import { User } from '../../types'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '../ui/Select'
 
 interface Props {
 	user: User | null
@@ -74,6 +81,10 @@ const EditUserModal: React.FC<Props> = ({ user, open, onClose, onUpdated }) => {
 		}
 	}
 
+	const handleSelectChange = (value: string) => {
+		setFormData({ ...formData, specialty: value })
+	}
+
 	return (
 		<Dialog.Root open={open} onOpenChange={onClose}>
 			<Dialog.Portal>
@@ -113,12 +124,34 @@ const EditUserModal: React.FC<Props> = ({ user, open, onClose, onUpdated }) => {
 							value={formData.graduated_at?.slice(0, 4) || ''}
 							onChange={handleChange}
 						/>
-						<Input
-							name="specialty"
-							placeholder="Спеціальність"
-							value={formData.specialty}
-							onChange={handleChange}
-						/>
+						<div className="relative pt-2">
+							<Select
+								value={formData.specialty}
+								onValueChange={handleSelectChange}
+							>
+								<SelectTrigger className="w-full cursor-pointer rounded-md border border-[hsl(214.3,31.8%,91.4%)] bg-[hsl(210,40%,98%)] px-4 py-2 text-base md:text-sm placeholder:text-[hsl(215.4,16.3%,46.9%)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(252,56%,57%)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10">
+									<SelectValue placeholder="Спеціалізація" />
+								</SelectTrigger>
+
+								<SelectContent>
+									<SelectItem value="Програмна інженерія">
+										Програмна інженерія
+									</SelectItem>
+									<SelectItem value="Комп'ютерні науки">
+										Комп'ютерні науки
+									</SelectItem>
+									<SelectItem value="Штучний інтелект">
+										Штучний інтелект
+									</SelectItem>
+									<SelectItem value="Кібербезпека">Кібербезпека</SelectItem>
+									<SelectItem value="Наука про дані">Наука про дані</SelectItem>
+								</SelectContent>
+							</Select>
+							<GraduationCap
+								className="absolute left-3 mt-1 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[hsl(215.4,16.3%,46.9%)]"
+								aria-hidden="true"
+							/>
+						</div>
 
 						<Input
 							type="password"

@@ -553,7 +553,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 					{formData.graduation.map((g, index) => (
 						<div
 							key={index}
-							className="space-y-2 mb-4 border border-gray-200 rounded p-4 relative"
+							className="space-y-2 mb-4 border border-gray-200 rounded p-4"
 						>
 							<Button
 								variant="outline"
@@ -584,23 +584,25 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 									updateGraduationField(index, 'specialty', e.target.value)
 								}
 							/>
-							<Select
-								value={g.degree || ''}
-								onValueChange={(value) =>
-									updateGraduationField(index, 'degree', value)
-								}
-							>
-								<SelectTrigger>
-									<SelectValue placeholder="Оберіть ступінь" />
-								</SelectTrigger>
-								<SelectContent>
-									{graduationDegrees.map((deg) => (
-										<SelectItem key={deg.value} value={deg.value}>
-											{deg.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+							<div className="relative pt-2">
+								<Select
+									value={g.degree || ''}
+									onValueChange={(value) =>
+										updateGraduationField(index, 'degree', value)
+									}
+								>
+									<SelectTrigger className='className="w-full cursor-pointer rounded-md border border-[hsl(214.3,31.8%,91.4%)] bg-[hsl(210,40%,98%)] px-4 py-2 text-base md:text-sm placeholder:text-[hsl(215.4,16.3%,46.9%)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(252,56%,57%)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"'>
+										<SelectValue placeholder="Оберіть ступінь" />
+									</SelectTrigger>
+									<SelectContent>
+										{graduationDegrees.map((deg) => (
+											<SelectItem key={deg.value} value={deg.value}>
+												{deg.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
 
 							<Input
 								type="date"
