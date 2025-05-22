@@ -87,13 +87,15 @@ const Profile = () => {
 					<CardContent className="p-6">
 						<div className="flex flex-col md:flex-row gap-6">
 							<div className="flex-shrink-0">
-								<Avatar className="w-32 h-32 border-4 border-white">
-									<AvatarImage
-										src={profileData.avatar}
-										alt={profileData.name}
-									/>
-									<AvatarFallback>{profileData.name[0]}</AvatarFallback>
-								</Avatar>
+								{profileData && (
+									<Avatar className="w-32 h-32 border-4 border-white">
+										<AvatarImage
+											src={profileData.avatar}
+											alt={profileData.name}
+										/>
+										<AvatarFallback>{profileData.name[0]}</AvatarFallback>
+									</Avatar>
+								)}
 							</div>
 
 							<div className="flex-grow pt-20 max-md:pt-0">

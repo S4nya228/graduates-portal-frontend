@@ -14,6 +14,7 @@ import { useAppSelector } from '../hooks/redux'
 import { toast } from 'react-toastify'
 import ConfirmDialog from './ConfirmDialog'
 import EditPostModal from './admin/EditPostModal'
+import { useNavigate } from 'react-router-dom'
 
 export interface NewsCardProps {
 	post: {
@@ -51,14 +52,20 @@ const NewsCard: React.FC<NewsCardProps> = ({
 	const [isDeleting, setIsDeleting] = useState(false)
 	const [editPost, setEditPost] = useState<Post | null>(null)
 	const [editOpen, setEditOpen] = useState(false)
+	const navigate = useNavigate()
 
 	const handleEditClick = (post: Post) => {
 		setEditPost(post)
+
 		setEditOpen(true)
 	}
 
 	const handleToggleLike = async () => {
 		if (loading) return
+		if (!user) {
+			navigate('/login')
+			return
+		}
 		setLoading(true)
 
 		try {

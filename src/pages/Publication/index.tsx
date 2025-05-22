@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar'
 import Button from '../../components/ui/Button'
 import {
@@ -11,6 +11,7 @@ import {
 import { ChevronLeft, Heart, MessageSquare } from 'lucide-react'
 import PublicationComments from '../../components/PublicationComments'
 import postService from '../../services/postService'
+import { useAppSelector } from '../../hooks/redux'
 
 const Publication = () => {
 	const { id } = useParams()
@@ -19,6 +20,8 @@ const Publication = () => {
 	const [likeCount, setLikeCount] = useState<number>(0)
 	const [loading, setLoading] = useState<boolean>(true)
 	const [error, setError] = useState<string | null>(null)
+	const user = useAppSelector((state) => state.auth.user)
+	const navigate = useNavigate()
 
 	const fetchPost = async () => {
 		try {
@@ -44,15 +47,21 @@ const Publication = () => {
 
 		window.addEventListener('commentAdded', handler)
 		window.addEventListener('commentDeleted', handler)
+		window.addEventListener('commentUpdated', handler)
 
 		return () => {
 			window.removeEventListener('commentAdded', handler)
+			window.removeEventListener('commentDeleted', handler)
 			window.removeEventListener('commentUpdated', handler)
 		}
 	}, [])
 
 	const handleToggleLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault()
+		if (!user) {
+			navigate('/login')
+			return
+		}
 
 		if (loading) return
 
