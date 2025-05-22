@@ -22,7 +22,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 			<Card className="alumni-card overflow-hidden hover:border-[#8b5cf6] transition-colors">
 				<div className="flex max-md:flex-col items-start p-4 space-x-4 max-md:gap-5">
 					<Avatar className="w-12 h-12">
-						<AvatarImage src={avatar} alt={name} />
+						<AvatarImage className="object-cover" src={avatar} alt={name} />
 						<AvatarFallback>{name[0]}</AvatarFallback>
 					</Avatar>
 					<div className="flex-1 min-w-0">

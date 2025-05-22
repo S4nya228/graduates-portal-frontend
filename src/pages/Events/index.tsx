@@ -18,12 +18,16 @@ import {
 } from '../../components/ui/Select'
 import eventService, { Event } from '../../services/eventService'
 import { toast } from 'react-toastify'
+import { useAppSelector } from '../../hooks/redux'
+import { useNavigate } from 'react-router-dom'
 
 const Events: React.FC = () => {
 	const [events, setEvents] = useState<Event[]>([])
 	const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
 	const [selectedMonth, setSelectedMonth] = useState<string>('all')
 	const [loading, setLoading] = useState<boolean>(true)
+	const user = useAppSelector((state) => state.auth.user)
+	const navigate = useNavigate()
 
 	const fetchEvents = async () => {
 		try {
@@ -69,6 +73,10 @@ const Events: React.FC = () => {
 		eventId: number,
 		isRegistered: boolean
 	) => {
+		if (!user) {
+			navigate('/login')
+			return
+		}
 		try {
 			if (isRegistered) {
 				await eventService.unregister(eventId)

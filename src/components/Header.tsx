@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../store'
 import { authActions } from '../store/authSlice'
 import userService from '../services/userService'
+import { toast } from 'react-toastify'
 
 const Header = () => {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -51,6 +52,7 @@ const Header = () => {
 
 	const handleLogout = () => {
 		dispatch(authActions.logout())
+		toast.success('Ви вийшли з облікового запису')
 		setIsLoggedIn(false)
 	}
 

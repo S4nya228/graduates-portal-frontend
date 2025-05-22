@@ -34,7 +34,7 @@ export interface SearchFiltersResult {
 }
 
 const currentYear = new Date().getFullYear()
-const oldestYear = currentYear - 50
+const oldestYear = currentYear - 70
 
 const SearchFilters: React.FC<SearchFiltersProps> = ({ onSearch }) => {
 	const [filters, setFilters] = useState<SearchFilters>({

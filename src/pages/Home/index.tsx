@@ -203,7 +203,7 @@ const Index: React.FC = () => {
 								<h3 className="text-lg font-semibold mb-4">Швидкі дії</h3>
 
 								<div className="grid grid-cols-2 gap-3">
-									<Link to="/notification" className="w-full">
+									{/* <Link to="/notification" className="w-full">
 										<Button
 											variant="outline"
 											className="w-full justify-start hover:bg-[#8B5CF6]"
@@ -211,7 +211,7 @@ const Index: React.FC = () => {
 											<Bell className="mr-2 h-4 w-4" />
 											Сповіщення
 										</Button>
-									</Link>
+									</Link> */}
 									<SupportModal />
 								</div>
 							</div>
